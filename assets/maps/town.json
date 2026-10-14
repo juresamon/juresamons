@@ -1,0 +1,62 @@
+{
+  "compressionlevel": -1,
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 50,
+  "height": 35,
+  "tilewidth": 40,
+  "tileheight": 40,
+  "nextlayerid": 4,
+  "nextobjectid": 15,
+  "properties": [
+    { "name": "label", "type": "string", "value": "Town" },
+    { "name": "outside", "type": "bool", "value": true }
+  ],
+  "tilesets": [],
+  "layers": [
+    { "id": 1, "name": "ground", "type": "imagelayer", "image": "town.png", "opacity": 1, "visible": true, "x": 0, "y": 0 },
+    {
+      "id": 2, "name": "walls", "type": "objectgroup", "draworder": "topdown", "opacity": 1, "visible": true, "x": 0, "y": 0,
+      "objects": [
+        { "id": 1, "name": "top trees", "type": "", "x": 0, "y": 0, "width": 2000, "height": 80, "rotation": 0, "visible": true },
+        { "id": 2, "name": "left trees", "type": "", "x": 0, "y": 0, "width": 72, "height": 1400, "rotation": 0, "visible": true },
+        { "id": 3, "name": "right trees", "type": "", "x": 1928, "y": 0, "width": 72, "height": 1400, "rotation": 0, "visible": true },
+        { "id": 4, "name": "bottom trees", "type": "", "x": 0, "y": 1320, "width": 2000, "height": 80, "rotation": 0, "visible": true },
+        { "id": 14, "name": "pond", "type": "", "x": 172, "y": 1046, "width": 256, "height": 148, "rotation": 0, "visible": true },
+        { "id": 5, "name": "your house", "type": "", "x": 200, "y": 120, "width": 360, "height": 300, "rotation": 0, "visible": true },
+        { "id": 6, "name": "other house", "type": "", "x": 900, "y": 120, "width": 360, "height": 300, "rotation": 0, "visible": true },
+        { "id": 7, "name": "lab", "type": "", "x": 560, "y": 700, "width": 480, "height": 340, "rotation": 0, "visible": true }
+      ]
+    },
+    {
+      "id": 3, "name": "objects", "type": "objectgroup", "draworder": "topdown", "opacity": 1, "visible": true, "x": 0, "y": 0,
+      "objects": [
+        { "id": 8, "name": "start", "type": "point", "point": true, "x": 380, "y": 500, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        { "id": 9, "name": "house", "type": "point", "point": true, "x": 380, "y": 500, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        { "id": 10, "name": "lab", "type": "point", "point": true, "x": 800, "y": 1120, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        {
+          "id": 11, "name": "into your house", "type": "door", "x": 350, "y": 420, "width": 60, "height": 30, "rotation": 0, "visible": true,
+          "properties": [
+            { "name": "spawn", "type": "string", "value": "from-town" },
+            { "name": "to", "type": "string", "value": "bedroom" }
+          ]
+        },
+        {
+          "id": 12, "name": "into the lab", "type": "door", "x": 770, "y": 1040, "width": 60, "height": 30, "rotation": 0, "visible": true,
+          "properties": [
+            { "name": "spawn", "type": "string", "value": "entry" },
+            { "name": "to", "type": "string", "value": "lab" }
+          ]
+        },
+        {
+          "id": 13, "name": "locked door", "type": "interact", "point": true, "x": 1080, "y": 430, "width": 0, "height": 0, "rotation": 0, "visible": true,
+          "properties": [{ "name": "scene", "type": "string", "value": "door-locked" }]
+        }
+      ]
+    }
+  ]
+}

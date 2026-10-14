@@ -1,0 +1,55 @@
+{
+  "compressionlevel": -1,
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 50,
+  "height": 30,
+  "tilewidth": 32,
+  "tileheight": 32,
+  "nextlayerid": 5,
+  "nextobjectid": 15,
+  "properties": [{ "name": "label", "type": "string", "value": "Bedroom" }],
+  "tilesets": [],
+  "layers": [
+    { "id": 1, "name": "ground", "type": "imagelayer", "image": "bedroom.png", "opacity": 1, "visible": true, "x": 0, "y": 0 },
+    {
+      "id": 2, "name": "walls", "type": "objectgroup", "draworder": "topdown", "opacity": 1, "visible": true, "x": 0, "y": 0,
+      "objects": [
+        { "id": 1, "name": "back wall", "type": "", "x": 0, "y": 0, "width": 1600, "height": 200, "rotation": 0, "visible": true },
+        { "id": 2, "name": "left wall", "type": "", "x": 0, "y": 0, "width": 40, "height": 960, "rotation": 0, "visible": true },
+        { "id": 3, "name": "right wall", "type": "", "x": 1560, "y": 0, "width": 40, "height": 960, "rotation": 0, "visible": true },
+        { "id": 4, "name": "front wall", "type": "", "x": 0, "y": 920, "width": 1600, "height": 40, "rotation": 0, "visible": true },
+        { "id": 5, "name": "bed", "type": "", "x": 120, "y": 250, "width": 210, "height": 290, "rotation": 0, "visible": true },
+        { "id": 6, "name": "desk legs", "type": "", "x": 1200, "y": 372, "width": 200, "height": 48, "rotation": 0, "visible": true }
+      ]
+    },
+    {
+      "id": 3, "name": "objects", "type": "objectgroup", "draworder": "topdown", "opacity": 1, "visible": true, "x": 0, "y": 0,
+      "objects": [
+        { "id": 7, "name": "start", "type": "point", "point": true, "x": 800, "y": 520, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        { "id": 8, "name": "bed", "type": "point", "point": true, "x": 225, "y": 320, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        { "id": 9, "name": "wake", "type": "point", "point": true, "x": 400, "y": 300, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        { "id": 10, "name": "door", "type": "point", "point": true, "x": 945, "y": 232, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        {
+          "id": 11, "name": "julian", "type": "npc", "point": true, "x": 420, "y": 440, "width": 0, "height": 0, "rotation": 0, "visible": true,
+          "properties": [{ "name": "showIf", "type": "string", "value": "intro_done" }]
+        },
+        { "id": 12, "name": "prop-desk", "type": "prop", "point": true, "x": 1300, "y": 420, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        { "id": 13, "name": "from-town", "type": "point", "point": true, "x": 945, "y": 280, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        {
+          "id": 14, "name": "to town", "type": "door", "x": 900, "y": 200, "width": 90, "height": 30, "rotation": 0, "visible": true,
+          "properties": [
+            { "name": "needs", "type": "string", "value": "left_room" },
+            { "name": "spawn", "type": "string", "value": "house" },
+            { "name": "to", "type": "string", "value": "town" }
+          ]
+        }
+      ]
+    },
+    { "id": 4, "name": "over", "type": "imagelayer", "image": "bedroom-over.png", "opacity": 1, "visible": true, "x": 0, "y": 0 }
+  ]
+}

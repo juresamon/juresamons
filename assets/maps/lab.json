@@ -1,0 +1,48 @@
+{
+  "compressionlevel": -1,
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 32,
+  "height": 18,
+  "tilewidth": 40,
+  "tileheight": 40,
+  "nextlayerid": 4,
+  "nextobjectid": 13,
+  "properties": [{ "name": "label", "type": "string", "value": "Lab" }],
+  "tilesets": [],
+  "layers": [
+    { "id": 1, "name": "ground", "type": "imagelayer", "image": "lab.png", "opacity": 1, "visible": true, "x": 0, "y": 0 },
+    {
+      "id": 2, "name": "walls", "type": "objectgroup", "draworder": "topdown", "opacity": 1, "visible": true, "x": 0, "y": 0,
+      "objects": [
+        { "id": 1, "name": "back wall", "type": "", "x": 0, "y": 0, "width": 1280, "height": 180, "rotation": 0, "visible": true },
+        { "id": 2, "name": "left wall", "type": "", "x": 0, "y": 0, "width": 40, "height": 720, "rotation": 0, "visible": true },
+        { "id": 3, "name": "right wall", "type": "", "x": 1240, "y": 0, "width": 40, "height": 720, "rotation": 0, "visible": true },
+        { "id": 4, "name": "front wall", "type": "", "x": 0, "y": 690, "width": 1280, "height": 30, "rotation": 0, "visible": true },
+        { "id": 5, "name": "machine", "type": "", "x": 120, "y": 340, "width": 200, "height": 80, "rotation": 0, "visible": true },
+        { "id": 6, "name": "table legs", "type": "", "x": 530, "y": 356, "width": 220, "height": 44, "rotation": 0, "visible": true }
+      ]
+    },
+    {
+      "id": 3, "name": "objects", "type": "objectgroup", "draworder": "topdown", "opacity": 1, "visible": true, "x": 0, "y": 0,
+      "objects": [
+        { "id": 7, "name": "start", "type": "point", "point": true, "x": 640, "y": 620, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        { "id": 8, "name": "entry", "type": "point", "point": true, "x": 640, "y": 620, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        {
+          "id": 9, "name": "out to town", "type": "door", "x": 580, "y": 655, "width": 120, "height": 35, "rotation": 0, "visible": true,
+          "properties": [
+            { "name": "spawn", "type": "string", "value": "lab" },
+            { "name": "to", "type": "string", "value": "town" }
+          ]
+        },
+        { "id": 10, "name": "prop-ball-table", "type": "prop", "point": true, "x": 640, "y": 400, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        { "id": 11, "name": "professor", "type": "npc", "point": true, "x": 640, "y": 340, "width": 0, "height": 0, "rotation": 0, "visible": true },
+        { "id": 12, "name": "assistant", "type": "npc", "point": true, "x": 960, "y": 440, "width": 0, "height": 0, "rotation": 0, "visible": true }
+      ]
+    }
+  ]
+}
