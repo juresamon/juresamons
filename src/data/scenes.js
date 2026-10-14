@@ -114,7 +114,7 @@ export const SCENES = {
   ],
 
   'battle-flirt': [
-    { say: 'player', expr: 'happy', text: 'aww julian can you just let me win pleaseeeee ill give you a kiss?' },
+    { say: 'player', expr: 'neutral', text: 'aww julian can you just let me win pleaseeeee ill give you a kiss?' },
     { say: 'julian', expr: 'blushing', text: 'o-okay fine hehe' },
     { say: 'julian', expr: 'happy', text: 'you win!!' },
     { end: true },
