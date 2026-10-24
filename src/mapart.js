@@ -382,10 +382,21 @@ function pine(ctx, x, y, s = TILE * 2) {
   stroke(ctx, x - s * 0.08, y - s * 0.96, x - s * 0.17, y - s * 0.8, 'rgba(255,255,255,.4)', 4);
 }
 
-// Pines on a list of [column, row] squares; each fills that square and the three after it.
-function pines(ctx, cells) {
-  [...cells].sort((a, b) => a[1] - b[1]).forEach(([c, r]) => pine(ctx, (c + 1) * TILE, (r + 2) * TILE - 6));
+// Things that stand up off the ground (trees, buildings, fences, signs) are drawn one by one
+// over the ground picture, each sorted by its base like the characters, so someone walking
+// behind one is hidden by it and someone in front isn't. Each is { x, y, w, h, base, draw }:
+// the box it fits in, the line it stands on, and a function that draws it in place.
+const standing = (x, y, w, h, base, draw) => ({ x, y, w, h, base, draw });
+
+// A pine on the [column, row] square; it fills that square and the three after it.
+function pineAt(c, r) {
+  const x = (c + 1) * TILE, y = (r + 2) * TILE - 6;
+  return standing(x - 62, y - 142, 124, 158, y, ctx => pine(ctx, x, y));
 }
+const houseThing = o => standing(o.x - 28, o.y - 30, o.w + 56, o.h + 52, o.y + o.h, ctx => house(ctx, o.x, o.y, o.w, o.h, o.roof, o.lines));
+const fenceThing = (x, y, w) => standing(x - 4, y - 42, w + 8, 46, y, ctx => fence(ctx, x, y, w));
+const signThing = (x, y, board) => standing(x - 34, y - 54, 68, 64, y, ctx => signpost(ctx, x, y, board));
+const mailboxThing = (x, y) => standing(x - 22, y - 70, 46, 78, y, ctx => mailbox(ctx, x, y));
 
 function house(ctx, x, y, w, h, roof, roofLines) {
   const top = y + Math.round(h * 0.45);
@@ -471,25 +482,26 @@ export function town(ctx, w, h) {
 
   const g = t.garden;
   for (let x = g.x; x < g.x + g.w; x += TILE) for (const y of [g.y + 20, g.y + 80]) flowers(ctx, x, y);
-  fence(ctx, g.x, g.y, g.w);
-  signpost(ctx, ...t.townSign);
   pond(ctx, t.pond.x, t.pond.y, t.pond.w, t.pond.h);
+}
 
-  t.mailboxes.forEach(([x, y]) => mailbox(ctx, x, y));
-  t.homes.forEach(o => house(ctx, o.x, o.y, o.w, o.h, o.roof, o.lines));
-  labBuilding(ctx, t.lab.x, t.lab.y, t.lab.w, t.lab.h);
-
-  const f = t.labFence;
-  fence(ctx, f.x, f.y, f.sign - 34 - f.x);
-  fence(ctx, f.sign + 34, f.y, f.x + f.w - f.sign - 34);
-  signpost(ctx, f.sign, f.y, '#dfe6ee');
-
+export function townStanding() {
+  const t = TOWN, g = t.garden, f = t.labFence, L = t.lab;
+  const things = [
+    fenceThing(g.x, g.y, g.w),
+    signThing(...t.townSign),
+    ...t.mailboxes.map(([x, y]) => mailboxThing(x, y)),
+    ...t.homes.map(houseThing),
+    standing(L.x - 22, L.y - 32, L.w + 44, L.h + 58, L.y + L.h, ctx => labBuilding(ctx, L.x, L.y, L.w, L.h)),
+    fenceThing(f.x, f.y, f.sign - 34 - f.x),
+    fenceThing(f.sign + 34, f.y, f.x + f.w - f.sign - 34),
+    signThing(f.sign, f.y, '#dfe6ee'),
+  ];
   // pines all round the edge, with a gap at the top for the way north and room for the pond
-  const cells = [];
-  for (let c = 0; c < 24; c += 2) if (c !== 12) cells.push([c, 0]);
-  for (let r = 2; r < 18; r += 2) cells.push([0, r], [22, r]);
-  for (const c of [0, 2, 4, 10, 12, 14, 16, 18, 20, 22]) cells.push([c, 18]);
-  pines(ctx, cells);
+  for (let c = 0; c < 24; c += 2) if (c !== 12) things.push(pineAt(c, 0));
+  for (let r = 2; r < 18; r += 2) things.push(pineAt(0, r), pineAt(22, r));
+  for (const c of [0, 2, 4, 10, 12, 14, 16, 18, 20, 22]) things.push(pineAt(c, 18));
+  return things;
 }
 
 // ---------- route ----------
@@ -561,7 +573,7 @@ export function runs(rows, letters) {
 }
 
 export function route(ctx, w, h) {
-  const rows = ROUTE.rows, at = (c, r) => rows[r]?.[c];
+  const rows = ROUTE.rows;
   grass(ctx, w, h, TILE);
   paths(ctx, runs(rows, 'p'));
   rows.forEach((row, r) => [...row].forEach((ch, c) => {
@@ -569,22 +581,27 @@ export function route(ctx, w, h) {
     if (ch === 'g') tallGrass(ctx, c * TILE, r * TILE);
   }));
   for (const [r, c0, c1] of ROUTE.ledges) ledge(ctx, c0 * TILE, (c1 + 1) * TILE, ledgeTop(r));
+}
 
+export function routeStanding() {
+  const rows = ROUTE.rows, at = (c, r) => rows[r]?.[c], things = [];
   rows.forEach((row, r) => [...row].forEach((ch, c) => {
-    if (ch === 'S') signpost(ctx, c * TILE + 30, r * TILE + 52, '#dfe6ee');
+    if (ch === 'T' && c % 2 === 0 && r % 2 === 0) things.push(pineAt(c, r));
+    if (ch === 'S') things.push(signThing(c * TILE + 30, r * TILE + 52, '#dfe6ee'));
     if (ch !== 'F') return;
     // a fence square with fence beside it runs sideways; one on its own is a gatepost
     if (at(c - 1, r) === 'F' || at(c + 1, r) === 'F') {
-      if (at(c - 1, r) !== 'F') fence(ctx, c * TILE, r * TILE + 50, runs([row.slice(c)], 'F')[0][2]);
+      if (at(c - 1, r) !== 'F') things.push(fenceThing(c * TILE, r * TILE + 50, runs([row.slice(c)], 'F')[0][2]));
     } else {
-      fencePosts(ctx, c * TILE + 30, r * TILE, (r + 1) * TILE + 10);
+      const x = c * TILE + 30, y0 = r * TILE, y1 = (r + 1) * TILE + 10;
+      things.push(standing(x - 10, y0 - 4, 20, y1 - y0 + 8, y1, ctx => fencePosts(ctx, x, y0, y1)));
     }
   }));
-
-  const cells = [];
-  rows.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === 'T' && c % 2 === 0 && r % 2 === 0) cells.push([c, r]); }));
-  pines(ctx, cells);
+  return things;
 }
+
+// The standing things for each map drawn in code.
+export const STANDING = { town: townStanding, route: routeStanding };
 
 // ---------- lab ----------
 

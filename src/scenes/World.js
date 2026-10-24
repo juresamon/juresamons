@@ -5,6 +5,7 @@ import { DEPTH, FONT, INK_CSS, once } from '../ui.js';
 import { MONS, JULIAN_PICKS } from '../data/battle.js';
 import { PLAYER_NAME } from '../data/characters.js';
 import { sfx } from '../sfx.js';
+import { STANDING } from '../mapart.js';
 
 const SPEED = 240;      // walking speed, pixels per second
 const FEET_W = 36;      // only a small box at the feet collides, so heads can overlap walls
@@ -66,6 +67,20 @@ export default class World extends Phaser.Scene {
     this.bounds = new G.Rectangle(0, 0, W, H);
 
     this.add.image(0, 0, `map-${key}`).setOrigin(0).setDepth(-1);
+    // Code-drawn maps stand their trees, buildings and fences up separately (see mapart.js).
+    // A hand-drawn map picture already has them, so it gets none.
+    if (STANDING[key] && this.textures.get(`map-${key}`).source[0].isCanvas) {
+      STANDING[key]().forEach((t, i) => {
+        const tex = `standing-${key}-${i}`;
+        if (!this.textures.exists(tex)) {
+          const canvas = this.textures.createCanvas(tex, t.w, t.h), ctx = canvas.getContext();
+          ctx.translate(-t.x, -t.y);
+          t.draw(ctx);
+          canvas.refresh();
+        }
+        this.add.image(t.x, t.y, tex).setOrigin(0).setDepth(t.base);
+      });
+    }
     if (this.textures.exists(`map-${key}-over`)) {
       this.add.image(0, 0, `map-${key}-over`).setOrigin(0).setDepth(DEPTH.over);
     }
