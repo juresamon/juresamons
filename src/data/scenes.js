@@ -16,6 +16,7 @@
 //   { warp: 'town', spawn: 'house', then: 'scene' }   go to another map, then play a scene there
 //   { starter: true }                                 the screen where she picks her Juresamon
 //   { battle: true }                                  the battle with Julian; then 'battle-win' or 'battle-flirt' plays
+//   { dance: true }                                   the dance battle; then 'dance-player' or 'dance-julian' plays
 //   { scene: 'after-battle' }                         play another scene's steps here, then carry on
 //   { ifFlag: 'x', then: 'scene-a', else: 'scene-b' } play one scene if a flag is set, the other if not
 //   { end: true }                                     the closing screen (not used for now)
@@ -102,7 +103,7 @@ export const SCENES = {
 
   'force-door': [
     { narrate: "Door is locked, it won't open..." },
-    { say: 'player', expr: 'neutral', text: 'Hmmm... should i force it open?' },
+    { say: 'player', expr: 'yawn', text: 'Hmmm... should i force it open?' },
     { narrate: 'You unleash your super strength from working out and easily break the lock' },
     { flag: 'door_broken' },
   ],
@@ -150,7 +151,7 @@ export const SCENES = {
 
   // After the battle, back in the lab. 'battle-<result>' plays depending on how it ended.
   'battle-win': [
-    { say: 'julian', expr: 'serious', text: 'Wow that was a tough battle. You did a great job!!!' },
+    { say: 'julian', expr: 'happy', text: 'Wow that was a tough battle. You did a great job!!!' },
     { say: 'julian', expr: 'dance', text: 'ALSO HAPPY BIRTHDAY!!! YAY!!!!!' },
     { scene: 'after-battle' },
   ],
@@ -207,12 +208,41 @@ export const SCENES = {
     { say: 'professor', text: 'HURRRYYYYY' },
   ],
 
-  // Julian at home. The dance battle comes next (not made yet).
+  // Julian at home, and the dance battle.
   'talk-julian-house': [
-    { say: 'julian', expr: 'happy', text: 'Hey {name}!' },
-    { say: 'player', expr: 'down', text: 'Professor said to hurry :(' },
-    { say: 'julian', expr: 'serious', text: 'Alright alright lets go...' },
+    { say: 'julian', expr: 'confused', text: 'Howd you get in...' },
+    { say: 'player', expr: 'shocked', text: 'Professor said to hurry :(' },
+    { say: 'julian', expr: 'happy', text: 'Alright alright lets go...' },
     { say: 'julian', expr: 'dance', text: 'AFTER YOU BEAT ME IN A DANCE BATTLE!!' },
+    { dance: true },
+  ],
+
+  'dance-julian': [
+    { say: 'player', expr: 'down', text: 'aww man i lost...' },
+    { say: 'julian', expr: 'happy', text: "awwwww it's okay" },
+    { say: 'julian', expr: 'dance', text: 'Do you wanna try again?' },
+    {
+      choice: ['Yes', 'No'],
+      branches: [
+        [{ dance: true }],
+        [
+          { say: 'julian', expr: 'adamant', text: "Alright then let's hurry and go see the professor!" },
+          { scene: 'dance-done' },
+        ],
+      ],
+    },
+  ],
+
+  'dance-player': [
+    { say: 'julian', expr: 'blushing', text: 'Hehe so pretty when you dance...' },
+    { say: 'julian', expr: 'adamant', text: 'Alright well lets head to go see the professor!' },
+    { scene: 'dance-done' },
+  ],
+
+  // Julian comes along again after the dance battle.
+  'dance-done': [
+    { flag: 'dance_done' },
+    { follow: 'julian' },
   ],
 
   'julian-pc': [

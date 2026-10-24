@@ -1,6 +1,6 @@
 // Stand-in art drawn in code. Anything in assets.js without a PNG yet gets one of these.
 import { DIRS } from './assets.js';
-import { bedroom, bedroomOver, julianHouse, desk, town, route, grassFront, shirtPoster, lab, ballTable, battleBg } from './mapart.js';
+import { bedroom, bedroomOver, julianHouse, desk, town, route, grassFront, shirtPoster, lab, ballTable, battleBg, danceBg } from './mapart.js';
 
 const INK = '#3a2e4d', SKIN = '#ffe2cf';
 const LOOKS = {
@@ -178,6 +178,7 @@ function draw(ctx, key, w, h, scene) {
   if (key === 'grass-front') return grassFront(ctx, w, h);
   if (key === 'prop-poster') return shirtPoster(ctx, w, h, scene.textures.exists('shirt-design') && scene.textures.get('shirt-design').getSourceImage());
   if (key === 'battle-bg') return battleBg(ctx, w, h);
+  if (key === 'dance-bg') return danceBg(ctx, w, h, scene.textures.exists('shirt-design') && scene.textures.get('shirt-design').getSourceImage());
   box(ctx, w, h, key);
 }
 

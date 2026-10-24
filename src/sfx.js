@@ -1,10 +1,16 @@
 // Sounds made in code, so no audio files are needed yet.
 let ctx;
 
+// The one audio context everything shares (the dance battle's music uses it too).
+export function audio() {
+  ctx = ctx || new AudioContext();
+  if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
+}
+
 function tone(freq, dur, vol) {
   try {
-    ctx = ctx || new AudioContext();
-    if (ctx.state === 'suspended') ctx.resume();
+    audio();
     const osc = ctx.createOscillator(), gain = ctx.createGain();
     osc.type = 'square';
     osc.frequency.value = freq;
@@ -22,4 +28,5 @@ export const sfx = {
   select: () => tone(880, 0.07, 0.05),
   hit: () => tone(160, 0.18, 0.08),
   heal: () => tone(990, 0.15, 0.04),
+  miss: () => tone(110, 0.14, 0.06),
 };

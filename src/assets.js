@@ -43,6 +43,7 @@ export const IMAGES = {
   'mon-socks-front': ['assets/mons/socks-front.png', 300, 300],
   'mon-socks-back': ['assets/mons/socks-back.png', 300, 300],
   'battle-bg': ['assets/ui/battle-bg.png', 1280, 720],
+  'dance-bg': ['assets/ui/dance-bg.png', 1400, 800],
 
   'player-sleep': ['assets/sprites/player-sleep.png', 76, 80],
   'prop-desk': ['assets/props/desk.png', 200, 140],

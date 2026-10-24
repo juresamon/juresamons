@@ -655,6 +655,59 @@ export function lab(ctx, w, h) {
   ctx.setLineDash([]);
 }
 
+// ---------- dance battle ----------
+
+// Julian's room seen from the front: his wallpaper, window, bookshelf, desk, poster and bed.
+export function danceBg(ctx, w, h, design) {
+  const floor = Math.round(h * 0.66);
+
+  // striped wallpaper and skirting board
+  ctx.fillStyle = '#e6eefa';
+  ctx.fillRect(0, 0, w, floor);
+  ctx.fillStyle = '#d6e3f5';
+  for (let x = 0; x < w; x += 48) ctx.fillRect(x, 0, 24, floor - 20);
+  ctx.fillStyle = '#8fa9c9';
+  ctx.fillRect(0, floor - 20, w, 20);
+
+  // wooden floor
+  ctx.fillStyle = '#e3c79c';
+  ctx.fillRect(0, floor, w, h - floor);
+  for (let y = floor + 34; y < h; y += 34) stroke(ctx, 0, y, w, y, 'rgba(150,100,55,.3)', 2);
+  stroke(ctx, 0, floor, w, floor, INK, 4);
+
+  windowPane(ctx, 620, 80, 170, 150);
+  bookshelf(ctx, 120, floor - 270, 170, 270, 31);
+
+  // desk with his computer
+  block(ctx, 360, floor - 130, 240, 26, '#c48e5c', 6);
+  block(ctx, 376, floor - 104, 16, 104, '#8a5a33', 3);
+  block(ctx, 568, floor - 104, 16, 104, '#8a5a33', 3);
+  block(ctx, 420, floor - 250, 120, 90, '#5d6f80', 6);
+  block(ctx, 430, floor - 240, 100, 70, '#8ef0c4', 3, 2);
+  block(ctx, 466, floor - 160, 28, 30, '#5d6f80', 3, 2);
+  block(ctx, 430, floor - 142, 100, 12, '#eef3ff', 3, 2);
+
+  // the shirt poster, above his bed
+  ctx.save();
+  ctx.translate(1195, 150);
+  shirtPoster(ctx, 120, 156, design);
+  ctx.restore();
+
+  // his bed, side on
+  block(ctx, 1270, floor - 210, 34, 210, '#9a6a3f', 10);
+  block(ctx, 1010, floor - 70, 280, 40, '#b27b4c', 8);
+  block(ctx, 1020, floor - 40, 16, 40, '#8a5a33', 3);
+  block(ctx, 1250, floor - 40, 16, 40, '#8a5a33', 3);
+  block(ctx, 1014, floor - 100, 270, 34, '#ffffff', 8);
+  block(ctx, 1190, floor - 126, 76, 30, '#eef3ff', 12);
+  block(ctx, 1000, floor - 110, 190, 52, '#6fa2df', 12);
+  block(ctx, 1000, floor - 110, 190, 16, '#a9cdf2', 8);
+
+  // his blue rug in front
+  oval(ctx, w / 2, floor + 150, 460, 80, '#7fa8e0', 3);
+  oval(ctx, w / 2, floor + 150, 400, 60, '#a3c3ef', 2);
+}
+
 // ---------- battle ----------
 
 // Sky, hills and a grassy field, with a platform for each creature (see SPOT in Battle.js).

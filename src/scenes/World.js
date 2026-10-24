@@ -363,6 +363,7 @@ export default class World extends Phaser.Scene {
     if (s.narrate) return this.hud.dialogue.say({ text: this.fill(s.narrate) });
     if (s.starter) return this.pickStarter();
     if (s.battle) return this.battle();
+    if (s.dance) return this.danceBattle();
     if (s.scene) return this.run(SCENES[s.scene] || []);
     if (s.ifFlag) return this.run(SCENES[state.flags[s.ifFlag] ? s.then : s.else] || []);
     if (s.end) {
@@ -435,6 +436,17 @@ export default class World extends Phaser.Scene {
     });
     await this.hud.fade(0, 500);
     await this.run(SCENES[`battle-${result}`] || []);
+  }
+
+  // The dance battle works the same way: 'dance-player' or 'dance-julian' plays after it.
+  async danceBattle() {
+    await this.hud.fade(1, 250);
+    const result = await new Promise(resolve => {
+      this.game.events.once('dance-over', resolve);
+      this.scene.launch('Dance');
+    });
+    await this.hud.fade(0, 500);
+    await this.run(SCENES[`dance-${result}`] || []);
   }
 
   actor(id) {
