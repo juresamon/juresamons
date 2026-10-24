@@ -4,6 +4,7 @@ import { idleFrame, sheetScale } from '../assets.js';
 import { DEPTH, FONT, INK_CSS, once } from '../ui.js';
 import { MONS, JULIAN_PICKS } from '../data/battle.js';
 import { PLAYER_NAME } from '../data/characters.js';
+import { sfx } from '../sfx.js';
 
 const SPEED = 240;      // walking speed, pixels per second
 const FEET_W = 36;      // only a small box at the feet collides, so heads can overlap walls
@@ -13,6 +14,8 @@ const FOLLOW_GAP = 64;  // how far behind her a follower walks
 const G = Phaser.Geom;
 
 const props = o => Object.fromEntries((o.properties || []).map(p => [p.name, p.value]));
+// Whether something marked with showIf / hideIf flags should be there right now.
+const present = p => (!p.showIf || !!state.flags[p.showIf]) && !(p.hideIf && state.flags[p.hideIf]);
 const feet = (x, y) => new G.Rectangle(x - FEET_W / 2, y - FEET_H, FEET_W, FEET_H);
 const dirTo = (from, to) => {
   const dx = to.x - from.x, dy = to.y - from.y;
@@ -31,11 +34,17 @@ function polyHitsRect(poly, r) {
 
 // The walkable map. Reads a Tiled file: a 'walls' object layer of shapes, and any other
 // object layer holding things told apart by their type:
-//   npc       a character; talking plays 'talk-<name>'. Optional property: showIf (a flag)
+//   npc       a character; talking plays 'talk-<name>', or the scene in its talk property
 //   prop      stand-up scenery she can walk behind; the name is the picture, placed by its base
 //   door      a box that sends her to another map. Properties: to, spawn, and optionally needs (a flag)
 //   interact  a spot she can press Space at. Property: scene
+//   trigger   a box that plays a scene as soon as she walks into it. Property: scene
+//   ledge     a thin box she can hop down over (walking down) but never cross any other way
+//   grass     a box of tall grass; anyone standing in it has their feet hidden
+//   barrier   an invisible wall, usually with showIf / hideIf so it can open up later
 //   (blank)   a named point, used as a spawn or by cutscenes
+// An npc, interact, trigger or barrier with showIf is only there once that flag is set, and one with
+// hideIf goes away once that flag is set.
 export default class World extends Phaser.Scene {
   constructor() { super('World'); }
 
@@ -66,6 +75,10 @@ export default class World extends Phaser.Scene {
     this.npcs = {};
     this.doors = [];
     this.spots = [];
+    this.triggers = [];
+    this.ledges = [];
+    this.grass = [];
+    this.barriers = [];
     this.follower = null;
     this.trail = [];
     for (const layer of map.layers) {
@@ -86,8 +99,10 @@ export default class World extends Phaser.Scene {
       fontFamily: FONT, fontSize: 16, color: '#ffffff', backgroundColor: INK_CSS, padding: { x: 8, y: 4 },
     }).setOrigin(0.5, 1).setDepth(DEPTH.over + 1).setVisible(false);
 
+    // Outside, the camera stops at the edge of the map; indoors it keeps her in the middle.
     const cam = this.cameras.main;
-    cam.setBounds(0, 0, W, H).startFollow(this.player, true);
+    if (this.outside) cam.setBounds(0, 0, W, H);
+    cam.startFollow(this.player, true);
     this.keys = this.input.keyboard.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT');
     // Caught as an event so a very quick tap is never missed between frames.
     this.spacePressed = false;
@@ -117,14 +132,22 @@ export default class World extends Phaser.Scene {
       if (o.name === state.follower) return;   // they are walking with her instead
       const key = p.sprite || o.name;
       const sprite = this.add.sprite(o.x, o.y, key, 0).setOrigin(0.5, 1).setScale(sheetScale(key)).setDepth(o.y);
-      sprite.setVisible(!p.showIf || !!state.flags[p.showIf]);
+      sprite.setVisible(present(p));
       this.npcs[o.name] = { sprite, key, home: { x: o.x, y: o.y }, talk: p.talk || `talk-${o.name}` };
     } else if (type === 'prop') {
       this.add.image(o.x, o.y, o.name).setOrigin(0.5, 1).setDepth(o.y);
     } else if (type === 'door') {
       this.doors.push({ rect: new G.Rectangle(o.x, o.y, o.width, o.height), to: p.to, spawn: p.spawn, needs: p.needs });
     } else if (type === 'interact') {
-      this.spots.push({ x: o.x + (o.width || 0) / 2, y: o.y + (o.height || 0) / 2, talk: p.scene });
+      this.spots.push({ x: o.x + (o.width || 0) / 2, y: o.y + (o.height || 0) / 2, talk: p.scene, when: p });
+    } else if (type === 'trigger') {
+      this.triggers.push({ rect: new G.Rectangle(o.x, o.y, o.width, o.height), scene: p.scene, when: p });
+    } else if (type === 'ledge') {
+      this.ledges.push(new G.Rectangle(o.x, o.y, o.width, o.height));
+    } else if (type === 'barrier') {
+      this.barriers.push({ rect: new G.Rectangle(o.x, o.y, o.width, o.height), when: p });
+    } else if (type === 'grass') {
+      this.grass.push(new G.Rectangle(o.x, o.y, o.width, o.height));
     } else {
       this.points[o.name] = { x: o.x, y: o.y };
     }
@@ -150,11 +173,13 @@ export default class World extends Phaser.Scene {
 
     const dx = (k.D.isDown || k.RIGHT.isDown) - (k.A.isDown || k.LEFT.isDown);
     const dy = (k.S.isDown || k.DOWN.isDown) - (k.W.isDown || k.UP.isDown);
+    let hopOver = null;
     if (dx || dy) {
       const step = SPEED * Math.min(this.game.loop.delta, 50) / 1000 / Math.hypot(dx, dy);
       // Try each direction on its own so she slides along walls instead of sticking.
       if (dx && !this.blocked(p.x + dx * step, p.y)) p.x += dx * step;
       if (dy && !this.blocked(p.x, p.y + dy * step)) p.y += dy * step;
+      else if (dy > 0) hopOver = this.ledgeBelow(p.x, p.y + dy * step);
       this.facing = dx ? (dx < 0 ? 'left' : 'right') : (dy < 0 ? 'up' : 'down');
       p.anims.play(`player-${this.facing}`, true);
       state.dirty = true;
@@ -162,12 +187,16 @@ export default class World extends Phaser.Scene {
       this.idle(p, 'player', this.facing);
     }
     p.setDepth(p.y);
+    this.wade(p);
     this.followStep();
 
     if (dx || dy) {
       const r = feet(p.x, p.y);
       const door = this.doors.find(d => (!d.needs || state.flags[d.needs]) && G.Intersects.RectangleToRectangle(r, d.rect));
       if (door) return this.warp(door.to, door.spawn);
+      const trigger = this.triggers.find(t => present(t.when) && G.Intersects.RectangleToRectangle(r, t.rect));
+      if (trigger) return this.play(trigger.scene);
+      if (hopOver) return this.hop(hopOver);
     }
 
     const near = this.nearest();
@@ -189,25 +218,59 @@ export default class World extends Phaser.Scene {
     const r = feet(x, y);
     if (!G.Rectangle.ContainsRect(this.bounds, r)) return true;
     if (this.walls.some(w => (w.rect ? G.Intersects.RectangleToRectangle(r, w.rect) : polyHitsRect(w.poly, r)))) return true;
+    if (this.ledges.some(l => G.Intersects.RectangleToRectangle(r, l))) return true;
+    if (this.barriers.some(b => present(b.when) && G.Intersects.RectangleToRectangle(r, b.rect))) return true;
     return Object.values(this.npcs).some(n => n.sprite.visible
       && G.Intersects.RectangleToRectangle(r, feet(n.sprite.x, n.sprite.y)));
+  }
+
+  // A ledge she is walking down onto from above, if the ground past it is clear to land on.
+  ledgeBelow(x, y) {
+    const r = feet(x, y);
+    return this.ledges.find(l => G.Intersects.RectangleToRectangle(r, l) && this.player.y <= l.y + 1
+      && !this.blocked(x, l.bottom + FEET_H + 4));
+  }
+
+  // A little jump down over a ledge.
+  hop(ledge) {
+    this.busy = true;
+    this.prompt.setVisible(false);
+    const p = this.player, from = p.y, to = ledge.bottom + FEET_H + 4;
+    sfx.tick();
+    return new Promise(resolve => this.tweens.addCounter({
+      from: 0, to: 1, duration: 300,
+      onUpdate: tw => {
+        const t = tw.getValue();
+        p.y = from + (to - from) * t - Math.sin(Math.PI * t) * 26;
+        p.setDepth(p.y);
+        this.wade(p);
+        this.followStep();
+      },
+      onComplete: () => {
+        p.y = to;
+        this.busy = false;
+        resolve();
+      },
+    }));
   }
 
   // The closest character or spot she can press Space at, if any is within reach.
   nearest() {
     const p = this.player;
-    const things = this.spots.map(s => ({ ...s, top: s.y - 70 }));
+    const things = this.spots.filter(s => present(s.when)).map(s => ({ ...s, top: s.y - 70 }));
     for (const n of Object.values(this.npcs)) {
       if (n.sprite.visible) things.push({ x: n.sprite.x, y: n.sprite.y, top: n.sprite.y - n.sprite.displayHeight, talk: n.talk, npc: n });
     }
-    // Outdoors she can also talk to whoever is following her ('follow-<name>' in scenes.js).
-    // He is always right beside her, so no SPACE tag is shown over him.
-    const f = this.follower;
-    if (f && this.outside) things.push({ x: f.sprite.x, y: f.sprite.y, talk: `follow-${f.key}`, npc: f, noPrompt: true });
     let best = null, bestDist = REACH;
     for (const t of things) {
       const d = Phaser.Math.Distance.Between(p.x, p.y, t.x, t.y);
       if (d < bestDist) { best = t; bestDist = d; }
+    }
+    // Outdoors she can also talk to whoever is following her ('follow-<name>' in scenes.js).
+    // He is always right beside her, so no SPACE tag is shown over him, and anyone else in reach comes first.
+    const f = this.follower;
+    if (!best && f && this.outside && Phaser.Math.Distance.Between(p.x, p.y, f.sprite.x, f.sprite.y) < REACH) {
+      best = { x: f.sprite.x, y: f.sprite.y, talk: `follow-${f.key}`, npc: f, noPrompt: true };
     }
     return best;
   }
@@ -236,6 +299,15 @@ export default class World extends Phaser.Scene {
     if (moved) s.anims.play(`${f.key}-${f.dir}`, true);
     else this.idle(s, f.key, f.dir);
     s.setDepth(s.y);
+    this.wade(s);
+  }
+
+  // Tall grass covers someone's feet while they stand in it.
+  wade(sprite) {
+    if (!this.grass.length) return;
+    const inGrass = sprite.visible && this.grass.some(g => g.contains(sprite.x, sprite.y - 2));
+    if (!sprite.grassFront) sprite.grassFront = this.add.image(0, 0, 'grass-front').setOrigin(0.5, 1);
+    sprite.grassFront.setVisible(inGrass).setPosition(sprite.x, sprite.y + 2).setDepth(sprite.y + 0.5);
   }
 
   idle(sprite, key, dir) {
@@ -291,6 +363,8 @@ export default class World extends Phaser.Scene {
     if (s.narrate) return this.hud.dialogue.say({ text: this.fill(s.narrate) });
     if (s.starter) return this.pickStarter();
     if (s.battle) return this.battle();
+    if (s.scene) return this.run(SCENES[s.scene] || []);
+    if (s.ifFlag) return this.run(SCENES[state.flags[s.ifFlag] ? s.then : s.else] || []);
     if (s.end) {
       state.dirty = false;   // the story is finished; no "unsaved progress" warning
       this.scene.stop('Hud');
@@ -301,6 +375,7 @@ export default class World extends Phaser.Scene {
     if (s.fade) return this.hud.fade(s.fade === 'out' ? 1 : 0, s.ms || 600);
     if (s.wait) return new Promise(resolve => this.time.delayedCall(s.wait, resolve));
     if (s.move) return this.moveActor(s.move, s.to, s.speed);
+    if (s.teleport) return this.teleport(s.teleport);
     if (s.warp) {
       this.warp(s.warp, s.spawn, s.then);
       return new Promise(() => {});   // this scene is about to restart; nothing after this step runs
@@ -309,8 +384,11 @@ export default class World extends Phaser.Scene {
       const a = this.actor(s.show);
       if (s.at) { const t = this.where(s.at, a); a.sprite.setPosition(t.x, t.y).setDepth(t.y); }
       a.sprite.setVisible(true);
+      this.wade(a.sprite);
     } else if (s.hide) {
-      this.actor(s.hide).sprite.setVisible(false);
+      const a = this.actor(s.hide);
+      a.sprite.setVisible(false);
+      this.wade(a.sprite);
     } else if (s.flag) {
       state.flags[s.flag] = true;
       state.dirty = true;
@@ -321,6 +399,16 @@ export default class World extends Phaser.Scene {
       if (npc) {
         delete this.npcs[s.follow];
         this.follower = { sprite: npc.sprite, key: npc.key, dir: 'down' };
+        this.trail = [];
+      }
+    } else if (s.unfollow) {
+      // Whoever was following stays where they are and becomes an ordinary character again.
+      const f = this.follower;
+      state.follower = null;
+      state.dirty = true;
+      if (f) {
+        this.npcs[f.key] = { sprite: f.sprite, key: f.key, home: { x: f.sprite.x, y: f.sprite.y }, talk: `talk-${f.key}` };
+        this.follower = null;
         this.trail = [];
       }
     } else if ('sleep' in s) {
@@ -366,13 +454,38 @@ export default class World extends Phaser.Scene {
     return new Promise(resolve => this.tweens.add({
       targets: s, x: t.x, y: t.y,
       duration: Phaser.Math.Distance.Between(s.x, s.y, t.x, t.y) / speed * 1000,
-      onUpdate: () => s.setDepth(s.y),
+      onUpdate: () => {
+        s.setDepth(s.y);
+        this.wade(s);
+        if (id === 'player') this.followStep();   // whoever follows her keeps up during cutscenes too
+      },
       onComplete: () => {
         this.idle(s, a.key, dir);
         if (id === 'player') this.facing = dir;
         resolve();
       },
     }));
+  }
+
+  // Spin round faster and faster, shoot up off the screen, and disappear.
+  async teleport(id) {
+    const a = this.actor(id), s = a.sprite, from = s.y, dirs = ['down', 'left', 'up', 'right'];
+    s.anims.stop();
+    let turn = 0, delay = 140;
+    const spinOnce = () => new Promise(resolve => this.time.delayedCall(delay, () => {
+      this.idle(s, a.key, dirs[turn++ % 4]);
+      resolve();
+    }));
+    sfx.heal();
+    while (delay > 30) { await spinOnce(); delay *= 0.85; }
+    const spin = this.time.addEvent({ delay: 30, loop: true, callback: () => this.idle(s, a.key, dirs[turn++ % 4]) });
+    sfx.select();
+    await new Promise(resolve => this.tweens.add({
+      targets: s, y: from - 900, duration: 450, ease: 'Quad.In', onComplete: resolve,
+    }));
+    spin.remove();
+    s.setVisible(false).setY(from);
+    this.idle(s, a.key, 'down');
   }
 
   // In bed she is a separate picture tucked under the map's -over layer.

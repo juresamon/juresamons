@@ -6,55 +6,696 @@
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "infinite": false,
-  "width": 50,
-  "height": 35,
-  "tilewidth": 40,
-  "tileheight": 40,
+  "width": 24,
+  "height": 20,
+  "tilewidth": 60,
+  "tileheight": 60,
   "nextlayerid": 4,
-  "nextobjectid": 15,
+  "nextobjectid": 39,
   "properties": [
-    { "name": "label", "type": "string", "value": "Town" },
-    { "name": "outside", "type": "bool", "value": true }
+    {
+      "name": "label",
+      "type": "string",
+      "value": "Town"
+    },
+    {
+      "name": "outside",
+      "type": "bool",
+      "value": true
+    }
   ],
   "tilesets": [],
   "layers": [
-    { "id": 1, "name": "ground", "type": "imagelayer", "image": "town.png", "opacity": 1, "visible": true, "x": 0, "y": 0 },
     {
-      "id": 2, "name": "walls", "type": "objectgroup", "draworder": "topdown", "opacity": 1, "visible": true, "x": 0, "y": 0,
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "town.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 2,
+      "name": "walls",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
       "objects": [
-        { "id": 1, "name": "top trees", "type": "", "x": 0, "y": 0, "width": 2000, "height": 80, "rotation": 0, "visible": true },
-        { "id": 2, "name": "left trees", "type": "", "x": 0, "y": 0, "width": 72, "height": 1400, "rotation": 0, "visible": true },
-        { "id": 3, "name": "right trees", "type": "", "x": 1928, "y": 0, "width": 72, "height": 1400, "rotation": 0, "visible": true },
-        { "id": 4, "name": "bottom trees", "type": "", "x": 0, "y": 1320, "width": 2000, "height": 80, "rotation": 0, "visible": true },
-        { "id": 14, "name": "pond", "type": "", "x": 172, "y": 1046, "width": 256, "height": 148, "rotation": 0, "visible": true },
-        { "id": 5, "name": "your house", "type": "", "x": 200, "y": 120, "width": 360, "height": 300, "rotation": 0, "visible": true },
-        { "id": 6, "name": "other house", "type": "", "x": 900, "y": 120, "width": 360, "height": 300, "rotation": 0, "visible": true },
-        { "id": 7, "name": "lab", "type": "", "x": 560, "y": 700, "width": 480, "height": 340, "rotation": 0, "visible": true }
+        {
+          "id": 1,
+          "name": "top trees",
+          "type": "",
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 110,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 2,
+          "name": "top trees",
+          "type": "",
+          "x": 840,
+          "y": 0,
+          "width": 600,
+          "height": 110,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 3,
+          "name": "left trees",
+          "type": "",
+          "x": 0,
+          "y": 0,
+          "width": 110,
+          "height": 1200,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 4,
+          "name": "right trees",
+          "type": "",
+          "x": 1330,
+          "y": 0,
+          "width": 110,
+          "height": 1200,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 5,
+          "name": "bottom trees",
+          "type": "",
+          "x": 0,
+          "y": 1080,
+          "width": 360,
+          "height": 120,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 6,
+          "name": "bottom trees",
+          "type": "",
+          "x": 600,
+          "y": 1080,
+          "width": 840,
+          "height": 120,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 7,
+          "name": "pond",
+          "type": "",
+          "x": 360,
+          "y": 1000,
+          "width": 240,
+          "height": 210,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 8,
+          "name": "your house",
+          "type": "",
+          "x": 300,
+          "y": 210,
+          "width": 300,
+          "height": 270,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 9,
+          "name": "julian house",
+          "type": "",
+          "x": 900,
+          "y": 210,
+          "width": 300,
+          "height": 270,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 10,
+          "name": "lab",
+          "type": "",
+          "x": 760,
+          "y": 630,
+          "width": 480,
+          "height": 300,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 11,
+          "name": "garden fence",
+          "type": "",
+          "x": 300,
+          "y": 680,
+          "width": 240,
+          "height": 22,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 12,
+          "name": "town sign",
+          "type": "",
+          "x": 306,
+          "y": 870,
+          "width": 48,
+          "height": 20,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 13,
+          "name": "lab fence",
+          "type": "",
+          "x": 790,
+          "y": 1040,
+          "width": 420,
+          "height": 22,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 14,
+          "name": "mailbox",
+          "type": "",
+          "x": 254,
+          "y": 450,
+          "width": 32,
+          "height": 20,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 15,
+          "name": "mailbox",
+          "type": "",
+          "x": 854,
+          "y": 450,
+          "width": 32,
+          "height": 20,
+          "rotation": 0,
+          "visible": true
+        }
       ]
     },
     {
-      "id": 3, "name": "objects", "type": "objectgroup", "draworder": "topdown", "opacity": 1, "visible": true, "x": 0, "y": 0,
+      "id": 3,
+      "name": "objects",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
       "objects": [
-        { "id": 8, "name": "start", "type": "point", "point": true, "x": 380, "y": 500, "width": 0, "height": 0, "rotation": 0, "visible": true },
-        { "id": 9, "name": "house", "type": "point", "point": true, "x": 380, "y": 500, "width": 0, "height": 0, "rotation": 0, "visible": true },
-        { "id": 10, "name": "lab", "type": "point", "point": true, "x": 800, "y": 1120, "width": 0, "height": 0, "rotation": 0, "visible": true },
         {
-          "id": 11, "name": "into your house", "type": "door", "x": 350, "y": 420, "width": 60, "height": 30, "rotation": 0, "visible": true,
+          "id": 16,
+          "name": "start",
+          "type": "point",
+          "x": 450,
+          "y": 560,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true
+        },
+        {
+          "id": 17,
+          "name": "house",
+          "type": "point",
+          "x": 450,
+          "y": 560,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true
+        },
+        {
+          "id": 18,
+          "name": "julian-house",
+          "type": "point",
+          "x": 1050,
+          "y": 560,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true
+        },
+        {
+          "id": 19,
+          "name": "lab",
+          "type": "point",
+          "x": 1000,
+          "y": 990,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true
+        },
+        {
+          "id": 20,
+          "name": "route",
+          "type": "point",
+          "x": 780,
+          "y": 80,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true
+        },
+        {
+          "id": 21,
+          "name": "exit-back",
+          "type": "point",
+          "x": 780,
+          "y": 320,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true
+        },
+        {
+          "id": 22,
+          "name": "julian-door-back",
+          "type": "point",
+          "x": 1050,
+          "y": 545,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true
+        },
+        {
+          "id": 23,
+          "name": "into your house",
+          "type": "door",
+          "x": 420,
+          "y": 480,
+          "width": 60,
+          "height": 30,
+          "rotation": 0,
+          "visible": true,
           "properties": [
-            { "name": "spawn", "type": "string", "value": "from-town" },
-            { "name": "to", "type": "string", "value": "bedroom" }
+            {
+              "name": "spawn",
+              "type": "string",
+              "value": "from-town"
+            },
+            {
+              "name": "to",
+              "type": "string",
+              "value": "bedroom"
+            }
           ]
         },
         {
-          "id": 12, "name": "into the lab", "type": "door", "x": 770, "y": 1040, "width": 60, "height": 30, "rotation": 0, "visible": true,
+          "id": 24,
+          "name": "into julian house",
+          "type": "door",
+          "x": 1020,
+          "y": 480,
+          "width": 60,
+          "height": 30,
+          "rotation": 0,
+          "visible": true,
           "properties": [
-            { "name": "spawn", "type": "string", "value": "entry" },
-            { "name": "to", "type": "string", "value": "lab" }
+            {
+              "name": "needs",
+              "type": "string",
+              "value": "door_broken"
+            },
+            {
+              "name": "spawn",
+              "type": "string",
+              "value": "entry"
+            },
+            {
+              "name": "to",
+              "type": "string",
+              "value": "julian-house"
+            }
           ]
         },
         {
-          "id": 13, "name": "locked door", "type": "interact", "point": true, "x": 1080, "y": 430, "width": 0, "height": 0, "rotation": 0, "visible": true,
-          "properties": [{ "name": "scene", "type": "string", "value": "door-locked" }]
+          "id": 25,
+          "name": "locked door",
+          "type": "interact",
+          "x": 1050,
+          "y": 500,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "julian-door"
+            },
+            {
+              "name": "showIf",
+              "type": "string",
+              "value": "julian_home"
+            },
+            {
+              "name": "hideIf",
+              "type": "string",
+              "value": "door_broken"
+            }
+          ]
+        },
+        {
+          "id": 26,
+          "name": "locked door walk",
+          "type": "trigger",
+          "x": 1020,
+          "y": 480,
+          "width": 60,
+          "height": 30,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "julian-door-walk"
+            },
+            {
+              "name": "showIf",
+              "type": "string",
+              "value": "julian_home"
+            },
+            {
+              "name": "hideIf",
+              "type": "string",
+              "value": "door_broken"
+            }
+          ]
+        },
+        {
+          "id": 27,
+          "name": "not the lab",
+          "type": "trigger",
+          "x": 1020,
+          "y": 480,
+          "width": 60,
+          "height": 30,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "not-the-lab"
+            },
+            {
+              "name": "showIf",
+              "type": "string",
+              "value": "left_room"
+            },
+            {
+              "name": "hideIf",
+              "type": "string",
+              "value": "julian_home"
+            }
+          ]
+        },
+        {
+          "id": 28,
+          "name": "into the lab",
+          "type": "door",
+          "x": 970,
+          "y": 930,
+          "width": 60,
+          "height": 30,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "spawn",
+              "type": "string",
+              "value": "entry"
+            },
+            {
+              "name": "to",
+              "type": "string",
+              "value": "lab"
+            }
+          ]
+        },
+        {
+          "id": 29,
+          "name": "to the route",
+          "type": "door",
+          "x": 720,
+          "y": 0,
+          "width": 120,
+          "height": 20,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "needs",
+              "type": "string",
+              "value": "route_open"
+            },
+            {
+              "name": "spawn",
+              "type": "string",
+              "value": "from-town"
+            },
+            {
+              "name": "to",
+              "type": "string",
+              "value": "route"
+            }
+          ]
+        },
+        {
+          "id": 30,
+          "name": "north barrier",
+          "type": "barrier",
+          "x": 720,
+          "y": 0,
+          "width": 120,
+          "height": 130,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "hideIf",
+              "type": "string",
+              "value": "route_open"
+            }
+          ]
+        },
+        {
+          "id": 31,
+          "name": "professor",
+          "type": "npc",
+          "x": 780,
+          "y": 175,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "showIf",
+              "type": "string",
+              "value": "professor_outside"
+            },
+            {
+              "name": "hideIf",
+              "type": "string",
+              "value": "route_open"
+            },
+            {
+              "name": "talk",
+              "type": "string",
+              "value": "professor-town"
+            }
+          ]
+        },
+        {
+          "id": 32,
+          "name": "dog",
+          "type": "npc",
+          "x": 780,
+          "y": 175,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "showIf",
+              "type": "string",
+              "value": "left_room"
+            },
+            {
+              "name": "hideIf",
+              "type": "string",
+              "value": "professor_outside"
+            }
+          ]
+        },
+        {
+          "id": 33,
+          "name": "dog blocks the way",
+          "type": "trigger",
+          "x": 720,
+          "y": 180,
+          "width": 120,
+          "height": 25,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "dog-blocks"
+            },
+            {
+              "name": "showIf",
+              "type": "string",
+              "value": "left_room"
+            },
+            {
+              "name": "hideIf",
+              "type": "string",
+              "value": "professor_outside"
+            }
+          ]
+        },
+        {
+          "id": 34,
+          "name": "professor stops her",
+          "type": "trigger",
+          "x": 720,
+          "y": 180,
+          "width": 120,
+          "height": 25,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "professor-stop"
+            },
+            {
+              "name": "showIf",
+              "type": "string",
+              "value": "professor_outside"
+            },
+            {
+              "name": "hideIf",
+              "type": "string",
+              "value": "route_open"
+            }
+          ]
+        },
+        {
+          "id": 35,
+          "name": "mailbox home",
+          "type": "interact",
+          "x": 270,
+          "y": 450,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "mailbox-home"
+            }
+          ]
+        },
+        {
+          "id": 36,
+          "name": "mailbox julian",
+          "type": "interact",
+          "x": 870,
+          "y": 450,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "mailbox-julian"
+            }
+          ]
+        },
+        {
+          "id": 37,
+          "name": "town sign",
+          "type": "interact",
+          "x": 330,
+          "y": 880,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "sign-town"
+            }
+          ]
+        },
+        {
+          "id": 38,
+          "name": "lab sign",
+          "type": "interact",
+          "x": 1000,
+          "y": 1050,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "sign-lab"
+            }
+          ]
         }
       ]
     }

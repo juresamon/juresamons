@@ -1,6 +1,6 @@
 // Stand-in art drawn in code. Anything in assets.js without a PNG yet gets one of these.
 import { DIRS } from './assets.js';
-import { bedroom, bedroomOver, desk, town, lab, ballTable, battleBg } from './mapart.js';
+import { bedroom, bedroomOver, julianHouse, desk, town, route, grassFront, shirtPoster, lab, ballTable, battleBg } from './mapart.js';
 
 const INK = '#3a2e4d', SKIN = '#ffe2cf';
 const LOOKS = {
@@ -95,6 +95,58 @@ function walker(ctx, w, h, dir, frame, look) {
   for (const off of dir === 'down' ? [-7, 7] : dir === 'left' ? [-10] : [10]) { circle(ctx, cx + off, cy + 4, 2.5); ctx.fill(); }
 }
 
+// A little wiener dog, standing with its feet on the bottom edge.
+function dachshund(ctx, w, h, dir) {
+  const BROWN = '#b8672f', DARK = '#7a3f1c', MUZZLE = '#d9925a';
+  const oval = (x, y, rx, ry, fill) => { ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fillStyle = fill; ctx.fill(); ctx.stroke(); };
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.fillStyle = 'rgba(0,0,0,.18)';
+  ctx.beginPath(); ctx.ellipse(w / 2, h - 4, dir === 'left' || dir === 'right' ? 28 : 14, 5, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = INK;
+
+  if (dir === 'left' || dir === 'right') {
+    ctx.save();
+    if (dir === 'left') { ctx.translate(w, 0); ctx.scale(-1, 1); }
+    ctx.fillStyle = BROWN;
+    for (const x of [14, 22, 42, 50]) { rounded(ctx, x, h - 16, 6, 12, 3); ctx.fill(); ctx.stroke(); }
+    ctx.strokeStyle = DARK; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(11, h - 24); ctx.lineTo(3, h - 32); ctx.stroke();
+    ctx.strokeStyle = INK; ctx.lineWidth = 2.5;
+    ctx.fillStyle = BROWN;
+    rounded(ctx, 8, h - 31, 48, 18, 9); ctx.fill(); ctx.stroke();
+    circle(ctx, 56, h - 32, 10); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = MUZZLE;
+    rounded(ctx, 58, h - 32, 13, 9, 4); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = INK;
+    circle(ctx, 70, h - 29, 2.5); ctx.fill();
+    circle(ctx, 58, h - 35, 2); ctx.fill();
+    oval(52, h - 29, 4, 8, DARK);
+    ctx.restore();
+    return;
+  }
+
+  const cx = w / 2;
+  ctx.fillStyle = BROWN;
+  for (const x of [cx - 10, cx + 4]) { rounded(ctx, x, h - 14, 6, 10, 3); ctx.fill(); ctx.stroke(); }
+  rounded(ctx, cx - 12, h - 30, 24, 22, 10); ctx.fill(); ctx.stroke();
+  if (dir === 'up') {
+    ctx.strokeStyle = DARK; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(cx, h - 14); ctx.lineTo(cx + 2, h - 6); ctx.stroke();
+    ctx.strokeStyle = INK; ctx.lineWidth = 2.5;
+  }
+  ctx.fillStyle = BROWN;
+  circle(ctx, cx, h - 34, 11); ctx.fill(); ctx.stroke();
+  oval(cx - 11, h - 31, 4, 8, DARK);
+  oval(cx + 11, h - 31, 4, 8, DARK);
+  if (dir === 'down') {
+    oval(cx, h - 29, 6, 4.5, MUZZLE);
+    ctx.fillStyle = INK;
+    circle(ctx, cx, h - 31, 2.5); ctx.fill();
+    for (const x of [cx - 5, cx + 5]) { circle(ctx, x, h - 37, 2); ctx.fill(); }
+  }
+}
+
 function sleeper(ctx, w, h, look) {
   const cx = w / 2, r = w * 0.3;
   ctx.strokeStyle = INK;
@@ -108,7 +160,7 @@ function sleeper(ctx, w, h, look) {
   face(ctx, cx, h * 0.33 + 2, r, 'sleep');
 }
 
-function draw(ctx, key, w, h) {
+function draw(ctx, key, w, h, scene) {
   const [kind, who, expr] = key.split('-');
   if (key === 'title-bg') return backdrop(ctx, w, h, '#ffc2d9', '#b9a7f5');
   if (key === 'intro-bg') return backdrop(ctx, w, h, '#d9f0e4', '#a9d4f0');
@@ -117,17 +169,21 @@ function draw(ctx, key, w, h) {
   if (key === 'player-sleep') return sleeper(ctx, w, h, LOOKS.player);
   if (key === 'map-bedroom') return bedroom(ctx, w, h);
   if (key === 'map-bedroom-over') return bedroomOver(ctx);
+  if (key === 'map-julian-house') return julianHouse(ctx, w, h);
   if (key === 'map-town') return town(ctx, w, h);
+  if (key === 'map-route') return route(ctx, w, h);
   if (key === 'map-lab') return lab(ctx, w, h);
   if (key === 'prop-desk') return desk(ctx, w, h);
   if (key === 'prop-ball-table') return ballTable(ctx, w, h);
+  if (key === 'grass-front') return grassFront(ctx, w, h);
+  if (key === 'prop-poster') return shirtPoster(ctx, w, h, scene.textures.exists('shirt-design') && scene.textures.get('shirt-design').getSourceImage());
   if (key === 'battle-bg') return battleBg(ctx, w, h);
   box(ctx, w, h, key);
 }
 
 export function placeholderImage(scene, key, w, h) {
   const tex = scene.textures.createCanvas(key, w, h);
-  draw(tex.getContext(), key, w, h);
+  draw(tex.getContext(), key, w, h, scene);
   tex.refresh();
 }
 
@@ -140,7 +196,8 @@ export function placeholderSheet(scene, key, fw, fh, cols) {
     for (let f = 0; f < cols; f++) {
       ctx.save();
       ctx.translate(f * fw, row * fh);
-      walker(ctx, fw, fh, dir, poses[f], LOOKS[key] || LOOKS.julian);
+      if (key === 'dog') dachshund(ctx, fw, fh, dir);
+      else walker(ctx, fw, fh, dir, poses[f], LOOKS[key] || LOOKS.julian);
       ctx.restore();
       tex.add(row * cols + f, 0, f * fw, row * fh, fw, fh);
     }

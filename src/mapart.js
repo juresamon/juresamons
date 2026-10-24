@@ -64,94 +64,167 @@ function bookshelf(ctx, x, y, w, h, seed) {
   }
 }
 
-// ---------- bedroom ----------
+// ---------- rooms ----------
 
-export function bedroom(ctx, w, h) {
-  // wooden floor
-  ctx.fillStyle = '#ecc795';
+function woodFloor(ctx, w, h, fill) {
+  ctx.fillStyle = fill;
   ctx.fillRect(0, 200, w, h - 200);
   for (let y = 200, row = 0; y < h; y += 40, row++) {
     stroke(ctx, 0, y, w, y, 'rgba(150,100,55,.3)', 2);
     for (let x = (row % 2) * 80; x < w; x += 160) stroke(ctx, x, y, x, y + 40, 'rgba(150,100,55,.3)', 2);
   }
+}
 
-  // back wall: striped wallpaper and skirting board
-  ctx.fillStyle = '#f8ecd9';
+// Striped wallpaper above a skirting board, filling the top 200px.
+function wallpaper(ctx, w, base, stripe, skirting) {
+  ctx.fillStyle = base;
   ctx.fillRect(0, 0, w, 200);
-  ctx.fillStyle = '#f1dfc4';
+  ctx.fillStyle = stripe;
   for (let x = 0; x < w; x += 48) ctx.fillRect(x, 0, 24, 180);
-  ctx.fillStyle = '#c99260';
+  ctx.fillStyle = skirting;
   ctx.fillRect(0, 180, w, 20);
   stroke(ctx, 0, 200, w, 200);
+}
 
-  // window with curtains
-  windowPane(ctx, 420, 46, 220, 112);
-  block(ctx, 390, 30, 280, 12, '#c99260', 4);
-  block(ctx, 396, 38, 34, 136, '#f7a8c2', 8);
-  block(ctx, 630, 38, 34, 136, '#f7a8c2', 8);
+// Side walls, and a front wall with an optional gap [from, to] for a way out.
+function roomEdges(ctx, w, h, fill, front = 40, gap = null) {
+  ctx.fillStyle = fill;
+  ctx.fillRect(0, 0, 40, h);
+  ctx.fillRect(w - 40, 0, 40, h);
+  ctx.fillRect(0, h - front, w, front);
+  stroke(ctx, 40, 200, 40, h - front);
+  stroke(ctx, w - 40, 200, w - 40, h - front);
+  if (!gap) return stroke(ctx, 40, h - front, w - 40, h - front);
+  stroke(ctx, 40, h - front, gap[0], h - front);
+  stroke(ctx, gap[1], h - front, w - 40, h - front);
+}
 
-  // framed picture
-  block(ctx, 720, 62, 100, 80, '#fffaf0', 4);
-  block(ctx, 730, 72, 80, 60, '#bfe6f7', 2, 2);
-  dot(ctx, 792, 88, 8, '#ffd76a');
+function door(ctx, x, y) {
+  block(ctx, x, y, 90, 150, '#b27b4c', 4);
+  block(ctx, x + 12, y + 14, 66, 52, '#c38b5a', 3, 2);
+  block(ctx, x + 12, y + 76, 66, 60, '#c38b5a', 3, 2);
+  dot(ctx, x + 72, y + 74, 5, '#ffd76a', 2);
+}
+
+function picture(ctx, x, y) {
+  block(ctx, x, y, 100, 80, '#fffaf0', 4);
+  block(ctx, x + 10, y + 10, 80, 60, '#bfe6f7', 2, 2);
+  dot(ctx, x + 72, y + 26, 8, '#ffd76a');
   ctx.beginPath();
-  ctx.moveTo(731, 131); ctx.lineTo(758, 102); ctx.lineTo(778, 120); ctx.lineTo(796, 104); ctx.lineTo(809, 131);
+  ctx.moveTo(x + 11, y + 69); ctx.lineTo(x + 38, y + 40); ctx.lineTo(x + 58, y + 58); ctx.lineTo(x + 76, y + 42); ctx.lineTo(x + 89, y + 69);
   ctx.closePath();
   ctx.fillStyle = '#8fd16a';
   ctx.fill();
+}
 
-  // door
-  block(ctx, 900, 50, 90, 150, '#b27b4c', 4);
-  block(ctx, 912, 64, 66, 52, '#c38b5a', 3, 2);
-  block(ctx, 912, 126, 66, 60, '#c38b5a', 3, 2);
-  dot(ctx, 972, 124, 5, '#ffd76a', 2);
-
-  bookshelf(ctx, 1090, 40, 150, 160, 11);
-
-  // plant in the corner
-  block(ctx, 1470, 142, 50, 52, '#e27d5c', 6);
-  dot(ctx, 1478, 128, 18, '#4ea64f', 3);
-  dot(ctx, 1514, 126, 18, '#4ea64f', 3);
-  dot(ctx, 1495, 112, 22, '#5cb85c', 3);
-
-  // side and front walls
-  ctx.fillStyle = '#e2c9a6';
-  ctx.fillRect(0, 0, 40, h);
-  ctx.fillRect(w - 40, 0, 40, h);
-  ctx.fillRect(0, h - 40, w, 40);
-  stroke(ctx, 40, 200, 40, h - 40);
-  stroke(ctx, w - 40, 200, w - 40, h - 40);
-  stroke(ctx, 40, h - 40, w - 40, h - 40);
-
-  // rug
-  block(ctx, 610, 520, 380, 210, '#8ec5ea', 26);
-  block(ctx, 632, 542, 336, 166, '#a9d6f2', 18, 2);
+function rug(ctx, x, y, w, h, outer, inner) {
+  block(ctx, x, y, w, h, outer, 26);
+  block(ctx, x + 22, y + 22, w - 44, h - 44, inner, 18, 2);
   ctx.setLineDash([10, 8]);
   ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.roundRect(648, 558, 304, 134, 12);
+  ctx.roundRect(x + 38, y + 38, w - 76, h - 76, 12);
   ctx.stroke();
   ctx.setLineDash([]);
+}
+
+// ---------- bedroom ----------
+
+export function bedroom(ctx, w, h) {
+  woodFloor(ctx, w, h, '#ecc795');
+  wallpaper(ctx, w, '#f8ecd9', '#f1dfc4', '#c99260');
+
+  // window with curtains
+  windowPane(ctx, 330, 46, 180, 112);
+  block(ctx, 300, 30, 240, 12, '#c99260', 4);
+  block(ctx, 306, 38, 34, 136, '#f7a8c2', 8);
+  block(ctx, 500, 38, 34, 136, '#f7a8c2', 8);
+
+  picture(ctx, 135, 60);
+  door(ctx, 600, 50);
+  bookshelf(ctx, 790, 40, 150, 160, 11);
+  roomEdges(ctx, w, h, '#e2c9a6');
+  rug(ctx, 420, 420, 300, 170, '#8ec5ea', '#a9d6f2');
 
   // doormat inside the door
-  block(ctx, 906, 204, 78, 22, '#e9a95e', 5);
+  block(ctx, 606, 204, 78, 22, '#e9a95e', 5);
 
   // bed: headboard, frame, mattress, pillow (the blanket is on the -over layer)
-  shadow(ctx, 225, 545, 120, 16);
-  block(ctx, 116, 232, 218, 48, '#9a6a3f', 12);
-  block(ctx, 120, 250, 210, 290, '#b27b4c', 10);
-  block(ctx, 132, 262, 186, 266, '#ffffff', 8);
-  block(ctx, 160, 272, 130, 62, '#eef3ff', 16);
+  shadow(ctx, 185, 545, 120, 16);
+  block(ctx, 76, 232, 218, 48, '#9a6a3f', 12);
+  block(ctx, 80, 250, 210, 290, '#b27b4c', 10);
+  block(ctx, 92, 262, 186, 266, '#ffffff', 8);
+  block(ctx, 120, 272, 130, 62, '#eef3ff', 16);
 }
 
 // The blanket, drawn in front of her so she looks tucked in.
 export function bedroomOver(ctx) {
-  block(ctx, 126, 344, 198, 190, '#f59bb8', 10);
-  block(ctx, 126, 344, 198, 32, '#ffd3e1', 10);
+  block(ctx, 86, 344, 198, 190, '#f59bb8', 10);
+  block(ctx, 86, 344, 198, 32, '#ffd3e1', 10);
   for (let y = 404, row = 0; y < 520; y += 34, row++) {
-    for (let x = 150 + (row % 2) * 17; x < 310; x += 34) dot(ctx, x, y, 4, 'rgba(255,255,255,.75)');
+    for (let x = 110 + (row % 2) * 17; x < 270; x += 34) dot(ctx, x, y, 4, 'rgba(255,255,255,.75)');
   }
+}
+
+// ---------- Julian's house ----------
+
+export function julianHouse(ctx, w, h) {
+  woodFloor(ctx, w, h, '#e3c79c');
+  wallpaper(ctx, w, '#e6eefa', '#d6e3f5', '#8fa9c9');
+
+  windowPane(ctx, 500, 46, 120, 100);
+  bookshelf(ctx, 300, 40, 140, 160, 31);
+  roomEdges(ctx, w, h, '#c9d6e6', 30, [420, 540]);
+  rug(ctx, 330, 330, 300, 180, '#7fa8e0', '#a3c3ef');
+
+  // desk with a computer against the back wall
+  shadow(ctx, 170, 296, 96, 10);
+  block(ctx, 80, 200, 180, 70, '#c48e5c', 6);
+  block(ctx, 92, 262, 14, 30, '#8a5a33', 3);
+  block(ctx, 234, 262, 14, 30, '#8a5a33', 3);
+  block(ctx, 120, 140, 90, 64, '#5d6f80', 5);
+  block(ctx, 127, 147, 76, 48, '#8ef0c4', 3, 2);
+  block(ctx, 150, 204, 30, 10, '#5d6f80', 3, 2);
+  block(ctx, 120, 226, 80, 20, '#eef3ff', 4, 2);
+
+  // bed with a blue blanket
+  shadow(ctx, 830, 425, 84, 12);
+  block(ctx, 756, 214, 148, 40, '#9a6a3f', 12);
+  block(ctx, 760, 230, 140, 190, '#b27b4c', 10);
+  block(ctx, 770, 240, 120, 170, '#ffffff', 8);
+  block(ctx, 786, 248, 88, 44, '#eef3ff', 14);
+  block(ctx, 766, 300, 128, 114, '#6fa2df', 10);
+  block(ctx, 766, 300, 128, 24, '#a9cdf2', 10);
+
+  // doormat at the way out
+  block(ctx, 420, 582, 120, 30, '#e9a95e', 6);
+}
+
+// A poster on Julian's wall of a white shirt with a design printed on it (an image, if loaded).
+export function shirtPoster(ctx, w, h, design) {
+  ctx.save();
+  ctx.scale(w / 140, h / 170);   // drawn on a 140 x 170 grid, then fitted to the poster's size
+  w = 140; h = 170;
+  block(ctx, 2, 2, w - 4, h - 4, '#fffaf0', 4);
+  block(ctx, 8, 8, w - 16, h - 16, '#cfe2f7', 3, 0);
+  ctx.beginPath();
+  ctx.moveTo(52, 26);
+  ctx.quadraticCurveTo(70, 42, 88, 26);
+  ctx.lineTo(112, 30); ctx.lineTo(132, 58); ctx.lineTo(117, 74); ctx.lineTo(110, 66);
+  ctx.lineTo(110, 156); ctx.lineTo(30, 156); ctx.lineTo(30, 66);
+  ctx.lineTo(23, 74); ctx.lineTo(8, 58); ctx.lineTo(28, 30);
+  ctx.closePath();
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+  ctx.strokeStyle = INK;
+  ctx.lineWidth = 3;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+  stroke(ctx, 56, 30, 84, 30, 'rgba(59,51,70,.25)', 2);
+  if (design) ctx.drawImage(design, 40, 54, 60, 70);
+  else block(ctx, 40, 54, 60, 70, '#7f86c9', 6, 0);
+  ctx.restore();
 }
 
 export function desk(ctx, w, h) {
@@ -170,17 +243,19 @@ export function desk(ctx, w, h) {
   block(ctx, 96, 14, 36, 12, '#f2a65a', 3, 2);
 }
 
-// ---------- town ----------
+// ---------- outdoors ----------
 
-function grass(ctx, w, h) {
+export const TILE = 60;   // the town and the route are laid out on a grid of 60px squares
+
+function grass(ctx, w, h, t = 40) {
   ctx.fillStyle = '#95d56f';
   ctx.fillRect(0, 0, w, h);
   ctx.fillStyle = '#8ccd67';
-  for (let y = 0, row = 0; y < h; y += 40, row++) {
-    for (let x = (row % 2) * 40; x < w; x += 80) ctx.fillRect(x, y, 40, 40);
+  for (let y = 0, row = 0; y < h; y += t, row++) {
+    for (let x = (row % 2) * t; x < w; x += t * 2) ctx.fillRect(x, y, t, t);
   }
   const r = rng(7);
-  for (let i = 0; i < 420; i++) {
+  for (let i = 0; i < (w * h) / 6700; i++) {
     const x = r() * w, y = r() * h;
     ctx.beginPath();
     ctx.moveTo(x - 4, y - 6); ctx.lineTo(x, y); ctx.lineTo(x + 4, y - 6);
@@ -201,42 +276,115 @@ function paths(ctx, rects) {
   }
 }
 
-function flowerBed(ctx, x, y, cols, rows, seed) {
-  const r = rng(seed);
-  const colours = ['#ff7a8a', '#ffffff', '#ffd76a'];
-  for (let j = 0; j < rows; j++) {
-    for (let i = 0; i < cols; i++) {
-      const fx = x + i * 26 + (j % 2) * 13, fy = y + j * 22;
-      const petal = colours[Math.floor(r() * colours.length)];
-      for (const [dx, dy] of [[-4, 0], [4, 0], [0, -4], [0, 4]]) dot(ctx, fx + dx, fy + dy, 4, petal);
-      dot(ctx, fx, fy, 3, '#f2a65a');
-    }
+// Two red flowers in one square.
+function flowers(ctx, x, y) {
+  for (const [fx, fy] of [[x + 20, y + 22], [x + 40, y + 40]]) {
+    dot(ctx, fx - 7, fy + 7, 5, '#4f9e3f');
+    dot(ctx, fx + 7, fy + 7, 5, '#4f9e3f');
+    for (const [dx, dy] of [[-5, 0], [5, 0], [0, -5], [0, 5]]) dot(ctx, fx + dx, fy + dy, 5, '#f26464');
+    dot(ctx, fx, fy, 3, '#ffd76a');
   }
 }
 
-function tallGrass(ctx, x, y, w, h) {
-  for (let ty = y, row = 0; ty < y + h; ty += 30, row++) {
-    for (let tx = x + (row % 2) * 20; tx < x + w - 20; tx += 40) {
-      ctx.beginPath();
-      ctx.moveTo(tx, ty + 30);
-      ctx.lineTo(tx + 5, ty + 4); ctx.lineTo(tx + 10, ty + 24);
-      ctx.lineTo(tx + 16, ty); ctx.lineTo(tx + 22, ty + 24);
-      ctx.lineTo(tx + 27, ty + 6); ctx.lineTo(tx + 32, ty + 30);
-      ctx.closePath();
-      ctx.fillStyle = '#4f9e3f';
-      ctx.fill();
-      ctx.strokeStyle = '#3a7d2e';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-  }
+// One clump of tall grass filling a 30px square.
+function tuft(ctx, x, y) {
+  ctx.beginPath();
+  ctx.moveTo(x, y + 30);
+  ctx.lineTo(x + 4, y + 6); ctx.lineTo(x + 9, y + 22);
+  ctx.lineTo(x + 15, y); ctx.lineTo(x + 21, y + 22);
+  ctx.lineTo(x + 26, y + 6); ctx.lineTo(x + 30, y + 30);
+  ctx.closePath();
+  ctx.fillStyle = '#4f9e3f';
+  ctx.fill();
+  ctx.strokeStyle = '#3a7d2e';
+  ctx.lineWidth = 2;
+  ctx.stroke();
 }
 
-function tree(ctx, x, y, r) {
-  shadow(ctx, x, y, r * 0.85, r * 0.28);
-  block(ctx, x - r * 0.18, y - r * 0.75, r * 0.36, r * 0.75, '#8a5a33', 3, 3);
-  dot(ctx, x, y - r * 1.25, r, '#3f9a4a', 3);
-  dot(ctx, x - r * 0.3, y - r * 1.5, r * 0.42, '#5cb85c');
+function tallGrass(ctx, x, y) {
+  ctx.fillStyle = '#6cb555';
+  ctx.fillRect(x, y, TILE, TILE);
+  for (const [dx, dy] of [[0, 0], [30, 0], [0, 30], [30, 30]]) tuft(ctx, x + dx, y + dy);
+}
+
+// The bottom of a few clumps, shown over someone's feet while they stand in tall grass.
+export function grassFront(ctx, w, h) {
+  for (let x = 0; x < w - 20; x += 17) tuft(ctx, x, h - 30);
+}
+
+// A low rocky ledge she can hop down but not climb. The matching wall sits on the same band.
+function ledge(ctx, x0, x1, y) {
+  block(ctx, x0 + 3, y, x1 - x0 - 6, 16, '#a26f4b', 8, 3);
+  stroke(ctx, x0 + 14, y + 5, x1 - 14, y + 5, '#c99063', 3);
+}
+
+// A white picket fence whose posts stand on the line y.
+function fence(ctx, x, y, w) {
+  block(ctx, x, y - 28, w, 7, '#f4f1ea', 3, 2);
+  block(ctx, x, y - 15, w, 7, '#f4f1ea', 3, 2);
+  for (let px = x + 8; px <= x + w - 8; px += 28) block(ctx, px - 6, y - 38, 12, 38, '#ffffff', 4, 2.5);
+}
+
+function fencePosts(ctx, x, y0, y1) {
+  block(ctx, x - 4, y0, 8, y1 - y0, '#f4f1ea', 3, 2);
+  for (let py = y0; py < y1; py += 30) block(ctx, x - 6, py, 12, 36, '#ffffff', 4, 2.5);
+}
+
+// A signboard standing on the line y.
+function signpost(ctx, x, y, board = '#c79a62') {
+  shadow(ctx, x, y, 28, 6);
+  block(ctx, x - 20, y - 18, 6, 18, '#8a5a33', 2, 2);
+  block(ctx, x + 14, y - 18, 6, 18, '#8a5a33', 2, 2);
+  block(ctx, x - 30, y - 50, 60, 36, board, 6);
+  stroke(ctx, x - 18, y - 38, x + 18, y - 38, 'rgba(59,51,70,.55)', 3);
+  stroke(ctx, x - 18, y - 27, x + 10, y - 27, 'rgba(59,51,70,.55)', 3);
+}
+
+function mailbox(ctx, x, y) {
+  shadow(ctx, x, y, 18, 5);
+  block(ctx, x - 4, y - 32, 8, 32, '#8a5a33', 2, 2);
+  block(ctx, x - 17, y - 58, 34, 28, '#ffffff', 12);
+  stroke(ctx, x - 9, y - 44, x + 9, y - 44, '#c9c2d6', 3);
+  block(ctx, x + 14, y - 66, 5, 20, '#e9706e', 2, 2);
+}
+
+function pond(ctx, x, y, w, h) {
+  block(ctx, x, y, w, h + 30, '#d9c58f', 30);
+  block(ctx, x + 12, y + 12, w - 24, h + 30, '#7cc8f2', 22, 0);
+  ctx.strokeStyle = 'rgba(255,255,255,.8)';
+  ctx.lineWidth = 3;
+  for (const [cx, cy, rx] of [[x + w * 0.35, y + 60, 36], [x + w * 0.65, y + 120, 28]]) {
+    ctx.beginPath(); ctx.ellipse(cx, cy, rx, rx * 0.35, 0, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+  }
+  dot(ctx, x + w - 52, y + 52, 14, '#6fbf5a', 2);
+  dot(ctx, x + 50, y + 150, 11, '#6fbf5a', 2);
+}
+
+// A pine tree standing on the line y, about two squares wide.
+function pine(ctx, x, y, s = TILE * 2) {
+  shadow(ctx, x, y - 4, s * 0.36, s * 0.09);
+  block(ctx, x - s * 0.07, y - s * 0.24, s * 0.14, s * 0.22, '#8a5a33', 3, 3);
+  ctx.save();
+  ctx.lineJoin = 'round';
+  for (const [base, top, half, fill] of [[0.18, 0.72, 0.46, '#3f9a4a'], [0.44, 0.94, 0.36, '#46a851'], [0.68, 1.1, 0.25, '#5cb85c']]) {
+    ctx.beginPath();
+    ctx.moveTo(x - s * half, y - s * base);
+    ctx.quadraticCurveTo(x, y - s * (base - 0.08), x + s * half, y - s * base);
+    ctx.lineTo(x, y - s * top);
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+  ctx.restore();
+  stroke(ctx, x - s * 0.08, y - s * 0.96, x - s * 0.17, y - s * 0.8, 'rgba(255,255,255,.4)', 4);
+}
+
+// Pines on a list of [column, row] squares; each fills that square and the three after it.
+function pines(ctx, cells) {
+  [...cells].sort((a, b) => a[1] - b[1]).forEach(([c, r]) => pine(ctx, (c + 1) * TILE, (r + 2) * TILE - 6));
 }
 
 function house(ctx, x, y, w, h, roof, roofLines) {
@@ -297,39 +445,145 @@ function labBuilding(ctx, x, y, w, h) {
   block(ctx, x + w / 2 - 40, y + h - 4, 80, 10, '#d8cbb3', 3, 2);
 }
 
+// Where everything in town stands. The walls in assets/maps/town.json are placed to match.
+export const TOWN = {
+  homes: [
+    { x: 300, y: 210, w: 300, h: 270, roof: '#e9706e', lines: '#c95553' },   // hers
+    { x: 900, y: 210, w: 300, h: 270, roof: '#6fa2df', lines: '#5385c2' },   // Julian's
+  ],
+  lab: { x: 760, y: 630, w: 480, h: 300 },
+  pond: { x: 360, y: 990, w: 240, h: 210 },
+  mailboxes: [[270, 470], [870, 470]],   // just left of each house
+  garden: { x: 300, y: 700, w: 240 },   // fence along y, flowers in the four squares below
+  townSign: [330, 890],
+  labFence: { x: 790, y: 1060, w: 420, sign: 1000 },
+  paths: [
+    [750, 0, 60, 560],      // north to the route
+    [420, 480, 60, 80], [1020, 480, 60, 80], [420, 500, 660, 60],
+    [700, 500, 60, 500], [700, 940, 330, 60],   // round the side of the lab to its door
+  ],
+};
+
 export function town(ctx, w, h) {
-  grass(ctx, w, h);
-  paths(ctx, [
-    [340, 420, 80, 180], [340, 520, 880, 80], [1040, 420, 80, 180],
-    [1140, 520, 80, 680], [760, 1120, 460, 80], [760, 1040, 80, 160],
-  ]);
+  const t = TOWN;
+  grass(ctx, w, h, TILE);
+  paths(ctx, t.paths);
 
-  flowerBed(ctx, 236, 446, 3, 3, 3);
-  flowerBed(ctx, 450, 446, 3, 3, 5);
-  flowerBed(ctx, 936, 446, 3, 3, 9);
-  flowerBed(ctx, 1150, 446, 3, 3, 13);
-  flowerBed(ctx, 600, 1064, 4, 2, 17);
-  flowerBed(ctx, 900, 1064, 4, 2, 19);
-  tallGrass(ctx, 1420, 880, 420, 340);
+  const g = t.garden;
+  for (let x = g.x; x < g.x + g.w; x += TILE) for (const y of [g.y + 20, g.y + 80]) flowers(ctx, x, y);
+  fence(ctx, g.x, g.y, g.w);
+  signpost(ctx, ...t.townSign);
+  pond(ctx, t.pond.x, t.pond.y, t.pond.w, t.pond.h);
 
-  // pond
-  oval(ctx, 300, 1120, 160, 96, '#d9c58f', 3);
-  oval(ctx, 300, 1118, 146, 84, '#7cc8f2');
-  ctx.strokeStyle = 'rgba(255,255,255,.8)';
-  ctx.lineWidth = 3;
-  for (const [cx, cy, rx] of [[250, 1090, 40], [350, 1140, 30]]) { ctx.beginPath(); ctx.ellipse(cx, cy, rx, rx * 0.35, 0, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke(); }
-  dot(ctx, 380, 1086, 14, '#6fbf5a', 2);
-  dot(ctx, 214, 1150, 11, '#6fbf5a', 2);
+  t.mailboxes.forEach(([x, y]) => mailbox(ctx, x, y));
+  t.homes.forEach(o => house(ctx, o.x, o.y, o.w, o.h, o.roof, o.lines));
+  labBuilding(ctx, t.lab.x, t.lab.y, t.lab.w, t.lab.h);
 
-  house(ctx, 200, 120, 360, 300, '#e9706e', '#c95553');
-  house(ctx, 900, 120, 360, 300, '#6fa2df', '#5385c2');
-  labBuilding(ctx, 560, 700, 480, 340);
+  const f = t.labFence;
+  fence(ctx, f.x, f.y, f.sign - 34 - f.x);
+  fence(ctx, f.sign + 34, f.y, f.x + f.w - f.sign - 34);
+  signpost(ctx, f.sign, f.y, '#dfe6ee');
 
-  // a ring of trees around the edge; drawn top to bottom so nearer trees overlap farther ones
-  const trees = [];
-  for (let x = 30; x < w; x += 68) trees.push([x, 78], [x, h - 6]);
-  for (let y = 150; y < h - 40; y += 68) trees.push([34, y], [w - 34, y]);
-  trees.sort((a, b) => a[1] - b[1]).forEach(([x, y]) => tree(ctx, x, y, 36));
+  // pines all round the edge, with a gap at the top for the way north and room for the pond
+  const cells = [];
+  for (let c = 0; c < 24; c += 2) if (c !== 12) cells.push([c, 0]);
+  for (let r = 2; r < 18; r += 2) cells.push([0, r], [22, r]);
+  for (const c of [0, 2, 4, 10, 12, 14, 16, 18, 20, 22]) cells.push([c, 18]);
+  pines(ctx, cells);
+}
+
+// ---------- route ----------
+
+// The route north of town, one letter per 60px square:
+//   T tree   . grass   p path   g tall grass   f flowers   F fence   S sign
+// `ledges` are [row, first column, last column]; each one is a low drop she can hop down.
+// The walls in assets/maps/route.json are made from this same grid.
+export const ROUTE = {
+  rows: [
+    'TTTTTTTTTTppppTTTTTTTTTT',
+    'TTTTTTTTTTppppTTTTTTTTTT',
+    'TT........pppp.....f.fTT',
+    'TT........ppppppppppppTT',
+    'TT......TTppppppppppppTT',
+    'TT......TT........ppppTT',
+    'TT.f...fTTggggggggggggTT',
+    'TTf...f.TTggggggggggggTT',
+    'TT.f...fTTggggggggggggTT',
+    'TTf...f.TTggggggggggggTT',
+    'TT......TTggggggggggggTT',
+    'TT.f....TT...pppppppppTT',
+    'TTf..........pppppppppTT',
+    'TT.f.........pppggggggTT',
+    'TTTT......TTTTTTggggggTT',
+    'TTTT......TTTTTTggggggTT',
+    'TT..............ggggggTT',
+    'TT...........pppggggggTT',
+    'TT...ppppppppppp...f.fTT',
+    'TT...ppppppppppp..f.f.TT',
+    'TT...pppp.............TT',
+    'TT...pppppppppppppppppTT',
+    'TT...pppppppppppppppppTT',
+    'TT................ppppTT',
+    'TTTTTTTTTTTTggggggppppTT',
+    'TTTTTTTTTTTTggggggppppTT',
+    'TT..........ggggggppppTT',
+    'TT.f.f......ggggggppppTT',
+    'TTf.f.......ggggggppppTT',
+    'TTppppppppppppppppppppTT',
+    'TTppppppppppppppppppppTT',
+    'TT.......S.pppp.......TT',
+    'TT..gggggggpppp..gggggTT',
+    'TT..gggggggpppp..gggggTT',
+    'TTggggggg.fppppgggggf.TT',
+    'TTgggggggf..gg.ggggg.fTT',
+    'TTFFFFFFFFFFggFFFFFFFFTT',
+    'TT.........FggF.......TT',
+    'TTTTTTTTTTTTggTTTTTTTTTT',
+    'TTTTTTTTTTTTggTTTTTTTTTT',
+  ],
+  ledges: [[5, 2, 7], [5, 10, 15], [10, 2, 7], [15, 4, 9], [20, 2, 3], [20, 5, 8], [20, 11, 21], [26, 18, 21], [31, 2, 5], [31, 10, 21]],
+};
+
+export const ledgeTop = row => row * TILE + 30;   // ledges are 16px tall bands across their row
+
+// Runs of one letter along each row, as [x, y, w, h] rectangles.
+export function runs(rows, letters) {
+  const out = [];
+  rows.forEach((row, r) => {
+    for (let c = 0; c < row.length;) {
+      if (!letters.includes(row[c])) { c++; continue; }
+      const start = c;
+      while (c < row.length && letters.includes(row[c])) c++;
+      out.push([start * TILE, r * TILE, (c - start) * TILE, TILE]);
+    }
+  });
+  return out;
+}
+
+export function route(ctx, w, h) {
+  const rows = ROUTE.rows, at = (c, r) => rows[r]?.[c];
+  grass(ctx, w, h, TILE);
+  paths(ctx, runs(rows, 'p'));
+  rows.forEach((row, r) => [...row].forEach((ch, c) => {
+    if (ch === 'f') flowers(ctx, c * TILE, r * TILE);
+    if (ch === 'g') tallGrass(ctx, c * TILE, r * TILE);
+  }));
+  for (const [r, c0, c1] of ROUTE.ledges) ledge(ctx, c0 * TILE, (c1 + 1) * TILE, ledgeTop(r));
+
+  rows.forEach((row, r) => [...row].forEach((ch, c) => {
+    if (ch === 'S') signpost(ctx, c * TILE + 30, r * TILE + 52, '#dfe6ee');
+    if (ch !== 'F') return;
+    // a fence square with fence beside it runs sideways; one on its own is a gatepost
+    if (at(c - 1, r) === 'F' || at(c + 1, r) === 'F') {
+      if (at(c - 1, r) !== 'F') fence(ctx, c * TILE, r * TILE + 50, runs([row.slice(c)], 'F')[0][2]);
+    } else {
+      fencePosts(ctx, c * TILE + 30, r * TILE, (r + 1) * TILE + 10);
+    }
+  }));
+
+  const cells = [];
+  rows.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === 'T' && c % 2 === 0 && r % 2 === 0) cells.push([c, r]); }));
+  pines(ctx, cells);
 }
 
 // ---------- lab ----------

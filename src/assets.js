@@ -28,9 +28,11 @@ export const IMAGES = {
   'portrait-assistant-neutral': portrait('assistant', 'neutral'),
 
   // Maps: the painting, plus an optional '-over' layer drawn in front of the characters.
-  'map-bedroom': ['assets/maps/bedroom.png', 1600, 960],
-  'map-bedroom-over': ['assets/maps/bedroom-over.png', 1600, 960],
-  'map-town': ['assets/maps/town.png', 2000, 1400],
+  'map-bedroom': ['assets/maps/bedroom.png', 992, 672],
+  'map-bedroom-over': ['assets/maps/bedroom-over.png', 992, 672],
+  'map-julian-house': ['assets/maps/julian-house.png', 960, 640],
+  'map-town': ['assets/maps/town.png', 1440, 1200],
+  'map-route': ['assets/maps/route.png', 1440, 2400],
   'map-lab': ['assets/maps/lab.png', 1280, 720],
 
   // Juresamons: front (Julian's, and the choosing screen) and back (hers in battle).
@@ -45,6 +47,9 @@ export const IMAGES = {
   'player-sleep': ['assets/sprites/player-sleep.png', 76, 80],
   'prop-desk': ['assets/props/desk.png', 200, 140],
   'prop-ball-table': ['assets/props/ball-table.png', 220, 120],
+  'grass-front': ['assets/props/grass-front.png', 64, 14],
+  'shirt-design': ['assets/props/shirt-design.png', 103, 120],   // printed on the shirt in Julian's poster
+  'prop-poster': ['assets/props/poster.png', 80, 104],
 };
 
 // Walk sheets. Frames are numbered row by row in the order facing down, left, right, up,
@@ -93,6 +98,14 @@ export const SHEETS = {
       [446, 7, 84, 80],     // up
     ],
   },
+  // Drawn in code (placeholder.js) until a picture is saved here.
+  dog: {
+    file: 'assets/sprites/dog.png',
+    cols: 1,
+    walk: [0],
+    frameWidth: 72,
+    frameHeight: 48,
+  },
   assistant: {
     file: 'assets/sprites/characters-2.png',
     cols: 1,
@@ -107,7 +120,7 @@ export const SHEETS = {
 };
 
 // Each map also needs assets/maps/<name>.json, exported from Tiled.
-export const MAPS = ['bedroom', 'town', 'lab'];
+export const MAPS = ['bedroom', 'julian-house', 'town', 'route', 'lab'];
 
 export const DIRS = ['down', 'left', 'right', 'up'];
 

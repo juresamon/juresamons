@@ -39,7 +39,7 @@ export class Dialogue {
 
     // An expression with no drawing yet gets a blank placeholder labelled with its name.
     const key = `portrait-${who}-${expr || 'neutral'}`;
-    const show = portrait && !!ch;
+    const show = portrait && !!ch && ch.portrait !== false;
     if (show && !this.scene.textures.exists(key)) placeholderImage(this.scene, key, 400, 480);
     this.portrait.setVisible(show);
     // Drawn portraits are all enlarged by the same amount, so characters keep their sizes

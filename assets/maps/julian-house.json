@@ -1,0 +1,246 @@
+{
+  "compressionlevel": -1,
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 30,
+  "height": 20,
+  "tilewidth": 32,
+  "tileheight": 32,
+  "nextlayerid": 4,
+  "nextobjectid": 14,
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "value": "Julian's House"
+    }
+  ],
+  "tilesets": [],
+  "layers": [
+    {
+      "id": 1,
+      "name": "ground",
+      "type": "imagelayer",
+      "image": "julian-house.png",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": 2,
+      "name": "walls",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 1,
+          "name": "back wall",
+          "type": "",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 200,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 2,
+          "name": "left wall",
+          "type": "",
+          "x": 0,
+          "y": 0,
+          "width": 40,
+          "height": 640,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 3,
+          "name": "right wall",
+          "type": "",
+          "x": 920,
+          "y": 0,
+          "width": 40,
+          "height": 640,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 4,
+          "name": "front wall",
+          "type": "",
+          "x": 0,
+          "y": 610,
+          "width": 960,
+          "height": 30,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 5,
+          "name": "desk",
+          "type": "",
+          "x": 80,
+          "y": 200,
+          "width": 180,
+          "height": 95,
+          "rotation": 0,
+          "visible": true
+        },
+        {
+          "id": 6,
+          "name": "bed",
+          "type": "",
+          "x": 760,
+          "y": 230,
+          "width": 140,
+          "height": 190,
+          "rotation": 0,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "objects",
+      "type": "objectgroup",
+      "draworder": "topdown",
+      "opacity": 1,
+      "visible": true,
+      "x": 0,
+      "y": 0,
+      "objects": [
+        {
+          "id": 7,
+          "name": "start",
+          "type": "point",
+          "x": 480,
+          "y": 560,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true
+        },
+        {
+          "id": 8,
+          "name": "entry",
+          "type": "point",
+          "x": 480,
+          "y": 560,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true
+        },
+        {
+          "id": 9,
+          "name": "julian",
+          "type": "npc",
+          "x": 600,
+          "y": 320,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "showIf",
+              "type": "string",
+              "value": "julian_home"
+            },
+            {
+              "name": "talk",
+              "type": "string",
+              "value": "talk-julian-house"
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "name": "prop-poster",
+          "type": "prop",
+          "x": 720,
+          "y": 154,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true
+        },
+        {
+          "id": 11,
+          "name": "computer",
+          "type": "interact",
+          "x": 170,
+          "y": 305,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "julian-pc"
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "name": "bed",
+          "type": "interact",
+          "x": 830,
+          "y": 430,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "julian-bed"
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "name": "out to town",
+          "type": "door",
+          "x": 420,
+          "y": 580,
+          "width": 120,
+          "height": 30,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "spawn",
+              "type": "string",
+              "value": "julian-house"
+            },
+            {
+              "name": "to",
+              "type": "string",
+              "value": "town"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
