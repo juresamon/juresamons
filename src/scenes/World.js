@@ -1,6 +1,6 @@
 import { state } from '../state.js';
 import { SCENES } from '../data/scenes.js';
-import { idleFrame } from '../assets.js';
+import { idleFrame, sheetScale } from '../assets.js';
 import { DEPTH, FONT, INK_CSS, once } from '../ui.js';
 import { MONS, JULIAN_PICKS } from '../data/battle.js';
 import { PLAYER_NAME } from '../data/characters.js';
@@ -78,7 +78,7 @@ export default class World extends Phaser.Scene {
 
     const at = state.x == null ? (this.points[state.spawn] || this.points.start) : state;
     this.facing = state.facing || 'down';
-    this.player = this.add.sprite(at.x, at.y, 'player').setOrigin(0.5, 1).setDepth(at.y);
+    this.player = this.add.sprite(at.x, at.y, 'player').setOrigin(0.5, 1).setScale(sheetScale('player')).setDepth(at.y);
     this.idle(this.player, 'player', this.facing);
     if (state.follower) this.addFollower(state.follower, at);
     this.sleeper = this.add.image(0, 0, 'player-sleep').setVisible(false);
@@ -116,7 +116,7 @@ export default class World extends Phaser.Scene {
     if (type === 'npc') {
       if (o.name === state.follower) return;   // they are walking with her instead
       const key = p.sprite || o.name;
-      const sprite = this.add.sprite(o.x, o.y, key, 0).setOrigin(0.5, 1).setDepth(o.y);
+      const sprite = this.add.sprite(o.x, o.y, key, 0).setOrigin(0.5, 1).setScale(sheetScale(key)).setDepth(o.y);
       sprite.setVisible(!p.showIf || !!state.flags[p.showIf]);
       this.npcs[o.name] = { sprite, key, home: { x: o.x, y: o.y }, talk: p.talk || `talk-${o.name}` };
     } else if (type === 'prop') {
@@ -135,7 +135,7 @@ export default class World extends Phaser.Scene {
     const spot = [[-56, 0], [56, 0], [0, 56], [0, -56]]
       .map(([dx, dy]) => ({ x: at.x + dx, y: at.y + dy }))
       .find(q => !this.blocked(q.x, q.y)) || at;
-    const sprite = this.add.sprite(spot.x, spot.y, id).setOrigin(0.5, 1).setDepth(spot.y);
+    const sprite = this.add.sprite(spot.x, spot.y, id).setOrigin(0.5, 1).setScale(sheetScale(id)).setDepth(spot.y);
     this.follower = { sprite, key: id, dir: 'down' };
     this.idle(sprite, id, 'down');
     this.trail = [];
@@ -198,7 +198,7 @@ export default class World extends Phaser.Scene {
     const p = this.player;
     const things = this.spots.map(s => ({ ...s, top: s.y - 70 }));
     for (const n of Object.values(this.npcs)) {
-      if (n.sprite.visible) things.push({ x: n.sprite.x, y: n.sprite.y, top: n.sprite.y - n.sprite.height, talk: n.talk, npc: n });
+      if (n.sprite.visible) things.push({ x: n.sprite.x, y: n.sprite.y, top: n.sprite.y - n.sprite.displayHeight, talk: n.talk, npc: n });
     }
     // Outdoors she can also talk to whoever is following her ('follow-<name>' in scenes.js).
     // He is always right beside her, so no SPACE tag is shown over him.

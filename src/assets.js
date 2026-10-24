@@ -55,6 +55,8 @@ export const IMAGES = {
 //   frameWidth / frameHeight  - an even grid starting at the top-left corner
 //   frames                    - one [x, y, width, height] box per frame, for sheets drawn freehand.
 //                               Each box is centred on the character with the feet on its bottom edge.
+//
+// `scale` (optional, default 1) shrinks or enlarges the character on the map.
 export const SHEETS = {
   player: {
     file: 'assets/sprites/characters.png',
@@ -70,6 +72,7 @@ export const SHEETS = {
   julian: {
     file: 'assets/sprites/characters.png',
     cols: 3,
+    scale: 0.92,   // a little taller than her, not a lot
     walk: [1, 0, 2, 0],
     frames: [
       [131, 570, 68, 92], [235, 571, 68, 92], [336, 572, 68, 92],   // down
@@ -107,5 +110,7 @@ export const SHEETS = {
 export const MAPS = ['bedroom', 'town', 'lab'];
 
 export const DIRS = ['down', 'left', 'right', 'up'];
+
+export const sheetScale = key => SHEETS[key]?.scale || 1;
 
 export const idleFrame = (key, dir) => DIRS.indexOf(dir) * SHEETS[key].cols;
